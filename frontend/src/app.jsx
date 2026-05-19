@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import CardPredict from './components/CardPredict';
 import TrendChart from './components/TrendChart';
 
 function App() {
-  const [airData] = useState({
+  // 1. Data dummy diatur sebagai default awal agar dashboard tidak kosong saat backend mati
+  const [airData, setAirData] = useState({
     city: "Surabaya",
     current_status: "NORMAL",
     predictions: {
@@ -12,6 +13,24 @@ function App() {
       sore_malam: { pm25: 28.4, pm10: 44.0, co: 0.9, status: "NORMAL" }
     }
   });
+
+  // 2. Fungsi 'Kabel Konektor' untuk menembak API Backend riil nanti
+  useEffect(() => {
+    const fetchRealData = async () => {
+      try {
+        // Ganti URL ini sesuai dengan endpoint endpoint API backend dari timmu nanti
+        const response = await fetch('http://localhost:8000/api/air-quality');
+        if (response.ok) {
+          const realData = await response.json();
+          setAirData(realData); // Jika backend siap, data dummy langsung diganti data asli
+        }
+      } catch (error) {
+        console.log("Backend belum tersambung atau belum aktif, menggunakan data simulasi.");
+      }
+    };
+
+    fetchRealData();
+  }, []);
 
   // Gaya pencahayaan bertema gelap manual (Inline Styles)
   const styles = {

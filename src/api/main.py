@@ -12,9 +12,10 @@ from src.models.anomaly import predict_anomaly, POLLUTANTS
 
 app = FastAPI(title="Aeris Air Quality API", version="1.0")
 
+# Force rebuild: Railway, please update my code!
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Mengizinkan semua website (termasuk buatan Intan) untuk mengakses
+    allow_origins=["*"],  # Mengizinkan semua domain
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

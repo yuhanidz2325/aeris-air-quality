@@ -102,27 +102,47 @@ async def get_history(
     parameter: Optional[str] = None
 ):
     """Query param: start_date, end_date, parameter. Return: historis + ISPU per jam."""
-    # TODO MINGGU 4: Tambahkan execute_query untuk menarik rentang data historis
-    return []
-
-@app.get("/ispu/surabaya")
-async def get_ispu():
-    """Return ISPU terkini per polutan + kategori + warna KLHK dari PostgreSQL."""
-    # Ambil 1 baris data paling terbaru dari database
-    query = """
-        SELECT pm25, pm10, ispu_pm25, ispu_pm10, ispu_category, ispu_color 
-        FROM air_quality_raw 
-        ORDER BY time DESC LIMIT 1
-    """
-    result = execute_query(query, fetch=True)
     
-    if result and len(result) > 0:
-        row = result[0]
-        return {
-            "pm25": {"value": row[2], "category": row[4], "color": row[5]},
-            "pm10": {"value": row[3], "category": row[4], "color": row[5]}
-        }
-    return {"message": "Data tidak tersedia di database"}
+    # Kita menggunakan kolom 'timestamp' sebagai acuan waktu.
+    # CATATAN: Jika di Supabase nama kolom waktumu adalah 'time', ganti kata 'timestamp' di bawah ini menjadi 'time'.
+    query = """
+        SELECT timestamp, pm25, ispu_pm25, pm10, ispu_pm10 
+        FROM air_quality_raw 
+        WHERE timestamp >= %s AND timestamp <= %s
+        ORDER BY timestamp ASC
+    """
+    
+    # Ambil data dari database Supabase
+    records = execute_query(query, (start_date, end_date), fetch=True)
+    
+    history_data = []
+    if records:
+        for row in records:
+            tstamp = row[0]
+            pm25_val = row[1] if row[1] is not None else 0.0
+            ispu_pm25_val = row[2] if row[2] is not None else 0.0
+            pm10_val = row[3] if row[3] is not None else 0.0
+            ispu_pm10_val = row[4] if row[4] is not None else 0.0
+            
+            # Jika Intan (Frontend) secara spesifik meminta "pm25"
+            if parameter == "pm25" or parameter is None:
+                history_data.append({
+                    "timestamp": tstamp,
+                    "parameter": "pm25",
+                    "value": pm25_val,
+                    "ispu_value": ispu_pm25_val
+                })
+                
+            # Jika Intan (Frontend) secara spesifik meminta "pm10"
+            if parameter == "pm10" or parameter is None:
+                history_data.append({
+                    "timestamp": tstamp,
+                    "parameter": "pm10",
+                    "value": pm10_val,
+                    "ispu_value": ispu_pm10_val
+                })
+
+    return history_data
 
 @app.get("/predict/surabaya", response_model=PredictionResponse)
 async def get_predictions():

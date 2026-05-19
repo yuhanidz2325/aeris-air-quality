@@ -1,49 +1,79 @@
 import React, { useState, useEffect } from 'react';
 import CardPredict from './components/CardPredict';
+import TrendChart from './components/TrendChart';
+
+const BASE_URL = "https://web-production-8b53f.up.railway.app";
 
 function App() {
-  // State untuk menyimpan data kualitas udara (Sementara pakai dummy data dulu)
-  const [airData, setAirData] = useState({
-    city: "Surabaya",
-    current_status: "NORMAL", // Hasil dari Isolation Forest
-    pollutants: {
-      pm25: 24.5,
-      pm10: 42.1,
-      co: 0.8
-    },
-    // Data prediksi per segmen waktu dari 15 model PyCaret Linda
-    predictions: {
-      pagi: { pm25: 22.1, pm10: 38.5, co: 0.6, status: "NORMAL" },
-      siang: { pm25: 45.8, pm10: 55.2, co: 1.2, status: "ANOMALI" },
-      sore_malam: { pm25: 28.4, pm10: 44.0, co: 0.9, status: "NORMAL" }
+  const [statusData, setStatusData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  async function loadStatus() {
+    try {
+      const res = await fetch(`${BASE_URL}/status/surabaya`);
+      const data = await res.json();
+      setStatusData(data);
+    } catch (err) {
+      console.error("Gagal fetch status:", err);
+    } finally {
+      setLoading(false);
     }
-  });
+  }
+
+  useEffect(() => {
+    loadStatus();
+    const interval = setInterval(loadStatus, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const styles = {
+    container: { backgroundColor: '#0f172a', color: '#f8fafc', minHeight: '100vh', padding: '30px', fontFamily: 'sans-serif' },
+    header: { borderBottom: '1px solid #334155', paddingBottom: '15px', marginBottom: '30px' },
+    title: { color: '#2dd4bf', margin: '0 0 5px 0', fontSize: '28px' },
+    subtitle: { color: '#94a3b8', margin: '0' },
+    statusBox: { backgroundColor: '#1e293b', border: '1px solid #475569', padding: '20px', borderRadius: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' },
+    sectionTitle: { fontSize: '20px', color: '#cbd5e1', marginBottom: '15px' }
+  };
+
+  const getCategory = () => {
+    if (!statusData) return "-";
+    return statusData.ispu_status?.[0]?.category ?? "-";
+  };
+
+  const getIspuValue = () => {
+    if (!statusData) return "-";
+    return statusData.ispu_status?.[0]?.value ?? "-";
+  };
+
+  const badgeColor = getCategory() === "Baik"
+    ? { backgroundColor: 'rgba(16,185,129,0.2)', color: '#34d399', padding: '8px 16px', borderRadius: '20px', fontWeight: 'bold' }
+    : { backgroundColor: 'rgba(244,63,94,0.2)', color: '#f43f5e', padding: '8px 16px', borderRadius: '20px', fontWeight: 'bold' };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white p-6">
-      {/* Header Dashboard */}
-      <header className="mb-8 border-b border-slate-800 pb-4">
-        <h1 className="text-3xl font-bold text-teal-400">AERIS Dashboard</h1>
-        <p className="text-slate-400">Sistem Deteksi Anomali Kualitas Udara Kota {airData.city}</p>
+    <div style={styles.container}>
+      <header style={styles.header}>
+        <h1 style={styles.title}>AERIS Dashboard</h1>
+        <p style={styles.subtitle}>Sistem Deteksi Anomali Kualitas Udara Kota Surabaya</p>
       </header>
 
-      {/* Ringkasan Status Utama */}
-      <div className="bg-slate-800 p-6 rounded-xl mb-8 border border-slate-700 flex justify-between items-center">
+      <div style={styles.statusBox}>
         <div>
-          <h2 className="text-lg font-medium text-slate-400">Status Kualitas Udara Saat Ini</h2>
-          <p className="text-sm text-slate-500">Berdasarkan Model Isolation Forest</p>
+          <h2 style={{ margin: '0 0 5px 0', fontSize: '18px' }}>Status Kualitas Udara Saat Ini</h2>
+          <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>
+            {loading ? "Memuat data..." : `ISPU: ${getIspuValue()} — ${getCategory()}`}
+          </p>
         </div>
-        <span className={`px-6 py-2 rounded-full font-bold text-lg ${
-          airData.current_status === "NORMAL" ? "bg-emerald-500/20 text-emerald-400" : "bg-rose-500/20 text-rose-400"
-        }`}>
-          {airData.current_status}
-        </span>
+        <span style={badgeColor}>{loading ? "..." : getCategory()}</span>
       </div>
 
-      {/* Bagian Komponen Kerjaannya Intan: Segmentasi Waktu Prediktif */}
-      <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-4 text-slate-300">Prediksi Polutan Berdasarkan Segmentasi Waktu</h2>
-        <CardPredict data={airData.predictions} />
+      <section style={{ marginBottom: '40px' }}>
+        <h2 style={styles.sectionTitle}>Visualisasi Tren Historis</h2>
+        <TrendChart baseUrl={BASE_URL} />
+      </section>
+
+      <section>
+        <h2 style={styles.sectionTitle}>Prediksi Polutan Berdasarkan Segmentasi Waktu</h2>
+        <CardPredict baseUrl={BASE_URL} />
       </section>
     </div>
   );

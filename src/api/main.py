@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Query, Depends, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from datetime import datetime, time
 from typing import List, Optional, Dict
@@ -10,6 +11,14 @@ from src.data.db_utils import execute_query
 from src.models.anomaly import predict_anomaly, POLLUTANTS
 
 app = FastAPI(title="Aeris Air Quality API", version="1.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], # Mengizinkan semua website (termasuk buatan Intan) untuk mengakses
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 async def root():

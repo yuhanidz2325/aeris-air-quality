@@ -1,6 +1,6 @@
 # Handover Doc – Minggu 2 | Linda Anggara Wati
 
-**Tanggal:** 18 May 2026  
+**Tanggal:** 22 May 2026  
 **Proyek:** Sistem Deteksi Anomali Kualitas Udara – Kelompok Aeris PENS 2026  
 
 ---
@@ -17,7 +17,7 @@
 
 ## Format Data Processed
 
-- **Shape:** 3,264 baris × 69 kolom  
+- **Shape:** 3,360 baris × 69 kolom  
 - **Timestamp kolom:** `time` (dtype: datetime64, timezone WIB)  
 - **Total fitur engineered:** 69 kolom  
 

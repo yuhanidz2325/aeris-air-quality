@@ -1,69 +1,104 @@
 import React, { useState, useEffect } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid,
+  Tooltip, ResponsiveContainer, ReferenceLine
+} from 'recharts';
 
 function TrendChart({ baseUrl }) {
-  const [data, setData] = useState([]);
+  const [data, setData]   = useState([]);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     async function loadHistory() {
       try {
-        const today = new Date().toISOString().split('T')[0];
-        const weekAgo = new Date(Date.now() - 7*24*60*60*1000).toISOString().split('T')[0];
-        
-        // PERBAIKAN 1: Ubah parameter URL menjadi start_date dan end_date
-        const res = await fetch(`${baseUrl}/history/surabaya?start_date=${weekAgo}&end_date=${today}&parameter=pm25`);
+        const today   = new Date().toISOString().split('T')[0];
+        const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+        const res  = await fetch(
+          `${baseUrl}/history/surabaya?start_date=${weekAgo}&end_date=${today}&parameter=pm25`
+        );
         const json = await res.json();
-        
-        // PERBAIKAN 2: Sesuaikan cara membaca item.value dari JSON API buatanmu
+
         const formatted = json.map(item => ({
-          timestamp: item.timestamp.slice(5, 10), // Mengambil bulan-tanggal (MM-DD)
-          pm25: item.value ?? 0 
+          timestamp: item.timestamp.slice(5, 10),
+          pm25: item.value ?? 0,
         }));
-        
         setData(formatted);
       } catch (err) {
         console.error("Gagal fetch history:", err);
+        setError(true);
       }
     }
     loadHistory();
   }, [baseUrl]);
 
-  const styles = {
-    box: { backgroundColor: '#1e293b', border: '1px solid #334155', padding: '20px', borderRadius: '12px', height: '300px' },
-    header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' },
-    title: { fontSize: '16px', fontWeight: 'bold', color: '#e2e8f0', margin: 0 },
-    legendGroup: { display: 'flex', gap: '15px', fontSize: '12px' },
-    legendTeal: { color: '#2dd4bf', display: 'flex', alignItems: 'center', gap: '5px' },
-    legendRose: { color: '#f43f5e', display: 'flex', alignItems: 'center', gap: '5px' },
-    dotTeal: { width: '8px', height: '8px', backgroundColor: '#2dd4bf', borderRadius: '50%', display: 'inline-block' },
-    lineRose: { width: '12px', height: '2px', backgroundColor: '#f43f5e', display: 'inline-block' }
+  if (error) return (
+    <p style={{ fontSize: 12, color: '#A32D2D' }}>Gagal memuat data historis.</p>
+  );
+
+  if (data.length === 0) return (
+    <p style={{ fontSize: 12, color: '#888780' }}>Memuat grafik...</p>
+  );
+
+  // Custom tooltip light mode
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div style={{
+          background: '#fff', border: '0.5px solid #D3D1C7',
+          borderRadius: 8, padding: '8px 12px', fontSize: 12
+        }}>
+          <p style={{ color: '#888780', marginBottom: 4 }}>{label}</p>
+          <p style={{ color: '#0F6E56', fontWeight: 500 }}>
+            PM2.5: {payload[0].value.toFixed(1)} µg/m³
+          </p>
+        </div>
+      );
+    }
+    return null;
   };
 
   return (
-    <div style={styles.box}>
-      <div style={styles.header}>
-        <h3 style={styles.title}>Tren Historis Parameter PM2.5 (7 Hari Terakhir)</h3>
-        <div style={styles.legendGroup}>
-          <span style={styles.legendTeal}><span style={styles.dotTeal}></span> Konsentrasi PM2.5</span>
-          <span style={styles.legendRose}><span style={styles.lineRose}></span> Ambang Batas Sehat</span>
-        </div>
+    <div style={{ width: '100%', height: 220 }}>
+      {/* Legenda */}
+      <div style={{ display: 'flex', gap: 16, fontSize: 11, marginBottom: 8 }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#5F5E5A' }}>
+          <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#1D9E75', display: 'inline-block' }}></span>
+          Konsentrasi PM2.5
+        </span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#5F5E5A' }}>
+          <span style={{ width: 12, height: 2, background: '#E24B4A', display: 'inline-block' }}></span>
+          Ambang batas sehat (55 µg/m³)
+        </span>
       </div>
-      <div style={{ width: '100%', height: '230px' }}>
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-            <XAxis dataKey="timestamp" stroke="#94a3b8" fontSize={11} />
-            <YAxis stroke="#94a3b8" fontSize={11} unit=" μg" />
-            <Tooltip
-              contentStyle={{ backgroundColor: '#1e293b', borderColor: '#475569', color: '#fff' }}
-              itemStyle={{ color: '#2dd4bf' }}
-            />
-            <ReferenceLine y={55} stroke="#f43f5e" strokeDasharray="5 5" />
-            <Line type="monotone" dataKey="pm25" stroke="#2dd4bf" strokeWidth={3}
-              dot={{ r: 4, stroke: '#1e293b', strokeWidth: 2 }} activeDot={{ r: 6 }} />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
+
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={data} margin={{ top: 6, right: 10, left: -20, bottom: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#E8E6DF" />
+          <XAxis
+            dataKey="timestamp"
+            stroke="#888780"
+            fontSize={11}
+            tick={{ fill: '#888780' }}
+          />
+          <YAxis
+            stroke="#888780"
+            fontSize={11}
+            unit=" µg"
+            tick={{ fill: '#888780' }}
+          />
+          <Tooltip content={<CustomTooltip />} />
+          <ReferenceLine y={55} stroke="#E24B4A" strokeDasharray="5 5" label={{ value: '55', fill: '#E24B4A', fontSize: 10 }} />
+          <Line
+            type="monotone"
+            dataKey="pm25"
+            stroke="#1D9E75"
+            strokeWidth={2.5}
+            dot={{ r: 4, stroke: '#fff', strokeWidth: 2, fill: '#1D9E75' }}
+            activeDot={{ r: 6 }}
+          />
+        </LineChart>
+      </ResponsiveContainer>
     </div>
   );
 }

@@ -102,45 +102,67 @@ async def get_history(
     end_date: datetime, 
     parameter: Optional[str] = None
 ):
-    """Query param: start_date, end_date, parameter. Return: historis + ISPU per jam."""
-    
-    # Kita menggunakan kolom 'timestamp' sebagai acuan waktu.
-    # CATATAN: Jika di Supabase nama kolom waktumu adalah 'time', ganti kata 'timestamp' di bawah ini menjadi 'time'.
     query = """
-        SELECT timestamp, pm25, ispu_pm25, pm10, ispu_pm10 
+        SELECT timestamp, pm25, pm10, co, no2, o3
         FROM air_quality_raw 
         WHERE timestamp >= %s AND timestamp <= %s
         ORDER BY timestamp ASC
     """
     
-    # Ambil data dari database Supabase
     records = execute_query(query, (start_date, end_date), fetch=True)
     
     history_data = []
     if records:
         for row in records:
-            tstamp = row[0]
+            tstamp  = row[0]
             pm25_val = row[1] if row[1] is not None else 0.0
-            ispu_pm25_val = row[2] if row[2] is not None else 0.0
-            pm10_val = row[3] if row[3] is not None else 0.0
-            ispu_pm10_val = row[4] if row[4] is not None else 0.0
-            
-            # Jika Intan (Frontend) secara spesifik meminta "pm25"
+            pm10_val = row[2] if row[2] is not None else 0.0
+            co_val   = row[3] if row[3] is not None else 0.0
+            no2_val  = row[4] if row[4] is not None else 0.0
+            o3_val   = row[5] if row[5] is not None else 0.0
+
+            # Hitung ISPU PM25 sederhana
+            ispu_pm25 = round((pm25_val / 55.4) * 100, 1)
+            ispu_pm10 = round((pm10_val / 150) * 100, 1)
+
             if parameter == "pm25" or parameter is None:
                 history_data.append({
                     "timestamp": tstamp,
                     "parameter": "pm25",
                     "value": pm25_val,
-                    "ispu_value": ispu_pm25_val
+                    "ispu_value": ispu_pm25
                 })
-                
-            # Jika Intan (Frontend) secara spesifik meminta "pm10"
+
             if parameter == "pm10" or parameter is None:
                 history_data.append({
                     "timestamp": tstamp,
                     "parameter": "pm10",
                     "value": pm10_val,
-                    "ispu_value": ispu_pm10_val
+                    "ispu_value": ispu_pm10
+                })
+
+            if parameter == "co":
+                history_data.append({
+                    "timestamp": tstamp,
+                    "parameter": "co",
+                    "value": co_val,
+                    "ispu_value": round((co_val / 15000) * 100, 1)
+                })
+
+            if parameter == "no2":
+                history_data.append({
+                    "timestamp": tstamp,
+                    "parameter": "no2",
+                    "value": no2_val,
+                    "ispu_value": round((no2_val / 200) * 100, 1)
+                })
+
+            if parameter == "o3":
+                history_data.append({
+                    "timestamp": tstamp,
+                    "parameter": "o3",
+                    "value": o3_val,
+                    "ispu_value": round((o3_val / 100) * 100, 1)
                 })
 
     return history_data

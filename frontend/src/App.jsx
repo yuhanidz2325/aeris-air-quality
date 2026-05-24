@@ -172,7 +172,7 @@ function TabPlaceholder({ icon, label }) {
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 20px', background: '#fff', border: '0.5px solid #D3D1C7', borderRadius: 12 }}>
       <div style={{ fontSize: 40, marginBottom: 12 }}>{icon}</div>
       <div style={{ fontSize: 16, fontWeight: 500, color: '#2C2C2A', marginBottom: 6 }}>Tab {label}</div>
-      <div style={{ fontSize: 13, color: '#888780' }}>Sedang dalam pengerjaan — Minggu 3</div>
+      <div style={{ fontSize: 13, color: '#888780' }}>Sedang dalam pengerjaan </div>
     </div>
   );
 }

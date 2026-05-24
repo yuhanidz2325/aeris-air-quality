@@ -1,3 +1,8 @@
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
+import subprocess
+import logging
+import threading
 from fastapi import FastAPI, Query, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -104,6 +109,80 @@ def save_prediction_to_db(segment: str, predictions: dict):
     for param, preds in predictions.items():
         if len(preds) > 0:
             execute_query(query, (now, segment, param, preds[0]), fetch=False)
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+def run_retraining():
+    logger.info("Memulai retraining otomatis...")
+    try:
+        result = subprocess.run(
+            ["python", "src/models/train_model.py"],
+            capture_output=True, text=True, timeout=3600
+        )
+        if result.returncode == 0:
+            logger.info("Retraining 15 model selesai!")
+        else:
+            logger.error(f"Retraining gagal: {result.stderr}")
+
+        result_if = subprocess.run(
+            ["python", "src/models/anomaly.py"],
+            capture_output=True, text=True, timeout=600
+        )
+        if result_if.returncode == 0:
+            logger.info("Retraining Isolation Forest selesai!")
+        else:
+            logger.error(f"Retraining IF gagal: {result_if.stderr}")
+    except Exception as e:
+        logger.error(f"Error saat retraining: {e}")
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(
+    run_retraining,
+    trigger=CronTrigger(day_of_week="sun", hour=1, minute=0),
+    id="weekly_retrain",
+    name="Retraining mingguan tiap Minggu jam 01.00",
+    replace_existing=True
+)
+
+@app.on_event("startup")
+async def startup_event():
+    scheduler.start()
+    logger.info("APScheduler started")
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    scheduler.shutdown()
+
+class RetrainResponse(BaseModel):
+    status: str
+    message: str
+    timestamp: datetime
+
+@app.post("/retrain", response_model=RetrainResponse)
+async def manual_retrain():
+    thread = threading.Thread(target=run_retraining, daemon=True)
+    thread.start()
+    tz = pytz.timezone('Asia/Jakarta')
+    return {
+        "status": "started",
+        "message": "Retraining dimulai di background.",
+        "timestamp": datetime.now(tz)
+    }
+
+@app.get("/retrain/status")
+async def retrain_status():
+    job = scheduler.get_job("weekly_retrain")
+    tz = pytz.timezone('Asia/Jakarta')
+    if job and job.next_run_time:
+        next_run = job.next_run_time.astimezone(tz).strftime("%Y-%m-%d %H:%M %Z")
+    else:
+        next_run = "Tidak terjadwal"
+    return {
+        "scheduler_running": scheduler.running,
+        "next_retrain": next_run,
+        "timestamp": datetime.now(tz)
+    }
 
 # ── ENDPOINTS ────────────────────────────────────────────────
 @app.get("/status/surabaya", response_model=StatusResponse)

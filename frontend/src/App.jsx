@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import CardPredict from './components/CardPredict';
 import TrendChart from './components/TrendChart';
 import GrafikTren from './components/GrafikTren';
+import Edukasi from './components/Edukasi';
 
 const BASE_URL = "https://web-production-8b53f.up.railway.app";
 
@@ -23,6 +24,7 @@ const TABS = [
   { key: 'anomali',  label: 'Anomali',       icon: '⚠️' },
   { key: 'prediksi', label: 'Prediksi',      icon: '🔮' },
   { key: 'data',     label: 'Kondisi Data',  icon: '🗄️' },
+  { key: 'edukasi', label: 'Edukasi', icon: '📚' },
 ];
 
 function IspuPanel({ ispuStatus }) {
@@ -237,6 +239,7 @@ function App() {
         {activeTab === 'anomali'  && <TabPlaceholder icon="⚠️" label="Anomali" />}
         {activeTab === 'prediksi' && <TabPlaceholder icon="🔮" label="Prediksi" />}
         {activeTab === 'data'     && <TabPlaceholder icon="🗄️" label="Kondisi Data" />}
+        {activeTab === 'edukasi' && <Edukasi />}
       </div>
 
       <div style={{ padding: '8px 24px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

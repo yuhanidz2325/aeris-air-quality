@@ -218,14 +218,19 @@ const ACCORDION_DATA = [
     konten: (
       <div>
         <p style={{ fontSize: 13, color: '#5F5E5A', lineHeight: 1.7, marginBottom: 12 }}>
-          Aeris adalah sistem deteksi anomali kualitas udara perkotaan berbasis machine learning yang dikembangkan sebagai proyek capstone mata kuliah Teknologi Web Service di Politeknik Elektronika Negeri Surabaya (PENS) tahun 2026.
+          Aeris adalah sistem deteksi anomali kualitas udara perkotaan berbasis machine learning yang dikembangkan sebagai proyek capstone mata kuliah Teknologi Web Service, Machine Learning Ops, &  Data Mining di Politeknik Elektronika Negeri Surabaya (PENS) tahun 2026.
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 }}>
           {[
             { label: 'Nama Sistem',    val: 'Aeris — Air Quality Anomaly Detection System' },
             { label: 'Institusi',      val: 'Politeknik Elektronika Negeri Surabaya (PENS)' },
             { label: 'Program Studi',  val: 'Sains Data Terapan' },
-            { label: 'Mata Kuliah',    val: 'Teknologi Web Service' },
+            { label: 'Mata Kuliah',    
+                val: [
+                    'Teknologi Web Service', 
+                    'Machine Learning Ops', 
+                    'Data Mining']
+                },
             { label: 'Tahun',          val: '2026' },
             { label: 'Sumber Data',    val: 'Open-Meteo Air Quality API' },
             { label: 'Lokasi Pantau',  val: 'Kota Surabaya (-7.2575, 112.7521)' },
@@ -252,7 +257,10 @@ const ACCORDION_DATA = [
         </div>
         <div style={{ marginTop: 12, padding: '10px 14px', background: '#E1F5EE', border: '0.5px solid #5DCAA5', borderRadius: 8 }}>
           <div style={{ fontSize: 12, color: '#085041', lineHeight: 1.6 }}>
-            <strong>Dosen Pembimbing:</strong> Yesta Medya Mahardhika, S.Tr.Kom., M.T
+            <strong>Dosen Pembimbing:</strong><br />
+            Renovita Edelani S.ST., M.Tr.Kom <br />	
+            Yesta Medya Mahardhika, S.Tr.Kom., M.T <br />
+            Entin Martiana Kusumaningtyas S.Kom, M.Kom
           </div>
         </div>
       </div>

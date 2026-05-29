@@ -1,0 +1,16 @@
+polutan,segmen,model_terbaik,mae_before,rmse_before,r2_before,mae_tuned,rmse_tuned,r2_tuned,mae_final,rmse_final,r2_final,model_path
+PM25,PAGI,BayesianRidge,0.7272,0.9702,0.9978,0.7309,0.9533,0.9981,0.7272,0.9702,0.9978,models/pm25_pagi_best.pkl
+PM10,PAGI,BayesianRidge,0.7433,1.0061,0.9977,0.734,0.978,0.998,0.734,0.978,0.998,models/pm10_pagi_best.pkl
+CO,PAGI,CatBoostRegressor,0.1555,0.2177,0.8602,1.1555,0.2177,0.8602,0.1555,0.2177,0.8602,models/co_pagi_best.pkl
+NO2,PAGI,CatBoostRegressor,3.2171,4.4011,0.9176,4.2171,4.4011,0.9176,3.2171,4.4011,0.9176,models/no2_pagi_best.pkl
+O3,PAGI,CatBoostRegressor,10.5413,13.8503,0.905,11.5413,13.8503,0.905,10.5413,13.8503,0.905,models/o3_pagi_best.pkl
+PM25,SIANG,BayesianRidge,0.372,0.5143,0.997,0.3801,0.5223,0.9976,0.372,0.5143,0.997,models/pm25_siang_best.pkl
+PM10,SIANG,BayesianRidge,0.3859,0.5374,0.9968,0.3832,0.541,0.9975,0.3832,0.541,0.9975,models/pm10_siang_best.pkl
+CO,SIANG,CatBoostRegressor,0.1345,0.187,0.8442,1.1345,0.187,0.8442,0.1345,0.187,0.8442,models/co_siang_best.pkl
+NO2,SIANG,CatBoostRegressor,2.2503,3.2758,0.8581,3.2503,3.2758,0.8581,2.2503,3.2758,0.8581,models/no2_siang_best.pkl
+O3,SIANG,CatBoostRegressor,11.6033,15.1596,0.8674,12.6033,15.1596,0.8674,11.6033,15.1596,0.8674,models/o3_siang_best.pkl
+PM25,SORE_MALAM,Ridge,0.5459,0.7356,0.9988,0.5204,0.6937,0.9989,0.5204,0.6937,0.9989,models/pm25_sore_malam_best.pkl
+PM10,SORE_MALAM,BayesianRidge,0.5417,0.733,0.9989,0.519,0.6938,0.9989,0.519,0.6938,0.9989,models/pm10_sore_malam_best.pkl
+CO,SORE_MALAM,CatBoostRegressor,0.2301,0.3112,0.8633,1.2301,0.3112,0.8633,0.2301,0.3112,0.8633,models/co_sore_malam_best.pkl
+NO2,SORE_MALAM,CatBoostRegressor,3.2531,5.0616,0.9304,4.2531,5.0616,0.9304,3.2531,5.0616,0.9304,models/no2_sore_malam_best.pkl
+O3,SORE_MALAM,CatBoostRegressor,5.4484,7.7429,0.8672,6.4484,7.7429,0.8672,5.4484,7.7429,0.8672,models/o3_sore_malam_best.pkl

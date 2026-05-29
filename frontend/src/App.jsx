@@ -1,8 +1,11 @@
+import LandingPage from './pages/LandingPage';
 import React, { useState, useEffect } from 'react';
 import CardPredict from './components/CardPredict';
 import TrendChart from './components/TrendChart';
 import GrafikTren from './components/GrafikTren';
 import Edukasi from './components/Edukasi';
+import Prediksi from './components/Prediksi';
+import DeteksiAnomali from './components/DeteksiAnomali';
 
 const BASE_URL = "https://web-production-8b53f.up.railway.app";
 
@@ -139,11 +142,11 @@ function TabBeranda({ statusData, loading }) {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-        <div style={{ background: '#fff', border: '0.5px solid #D3D1C7', borderRadius: 12, padding: '14px 16px' }}>
+        <div style={{ background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: 12, padding: '14px 16px' }}>
           <div style={sectionTitle}>Prediksi PM2.5 — 3 jam ke depan</div>
           <CardPredict baseUrl={BASE_URL} />
         </div>
-        <div style={{ background: '#fff', border: '0.5px solid #D3D1C7', borderRadius: 12, padding: '14px 16px' }}>
+        <div style={{ background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: 12, padding: '14px 16px' }}>
           <div style={sectionTitle}>Ringkasan hari ini</div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             {[
@@ -161,7 +164,7 @@ function TabBeranda({ statusData, loading }) {
         </div>
       </div>
 
-      <div style={{ background: '#fff', border: '0.5px solid #D3D1C7', borderRadius: 12, padding: '14px 16px' }}>
+      <div style={{ background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: 12, padding: '14px 16px' }}>
         <div style={sectionTitle}>Tren PM2.5 — 7 hari terakhir</div>
         <TrendChart baseUrl={BASE_URL} />
       </div>
@@ -171,7 +174,7 @@ function TabBeranda({ statusData, loading }) {
 
 function TabPlaceholder({ icon, label }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 20px', background: '#fff', border: '0.5px solid #D3D1C7', borderRadius: 12 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 20px', background: '#FFFFFF', border: '0.5px solid #D3D1C7', borderRadius: 12 }}>
       <div style={{ fontSize: 40, marginBottom: 12 }}>{icon}</div>
       <div style={{ fontSize: 16, fontWeight: 500, color: '#2C2C2A', marginBottom: 6 }}>Tab {label}</div>
       <div style={{ fontSize: 13, color: '#888780' }}>Sedang dalam pengerjaan </div>
@@ -180,6 +183,7 @@ function TabPlaceholder({ icon, label }) {
 }
 
 function App() {
+  const [showDashboard, setShowDashboard] = useState(false);
   const [activeTab, setActiveTab]   = useState('beranda');
   const [statusData, setStatusData] = useState(null);
   const [loading, setLoading]       = useState(true);
@@ -204,10 +208,17 @@ function App() {
     return () => clearInterval(interval);
   }, []);
 
+  if (!showDashboard) {
   return (
-    <div style={{ minHeight: '100vh', background: '#F1EFE8' }}>
+    <LandingPage
+      onEnter={() => setShowDashboard(true)}
+    />
+  );
+}
+  return (
+    <div style={{ minHeight: '100vh', background: '#F6FAF8', color: '#1F2937'}}>
 
-      <nav style={{ background: '#fff', borderBottom: '0.5px solid #D3D1C7', padding: '10px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <nav style={{ background: '#FFFFFF', borderBottom: '0.5px solid #E5E7EB', boxShadow: '0 1px 3px rgba(15, 23, 42, 0.04)', padding: '10px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{ width: 34, height: 34, borderRadius: 8, background: '#E1F5EE', border: '0.5px solid #5DCAA5', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>💨</div>
           <div>
@@ -224,23 +235,113 @@ function App() {
         </div>
       </nav>
 
-      <div style={{ background: '#fff', borderBottom: '0.5px solid #D3D1C7', padding: '0 24px', display: 'flex', overflowX: 'auto' }}>
-        {TABS.map(tab => (
-          <button key={tab.key} onClick={() => setActiveTab(tab.key)}
-            style={{ fontSize: 12, padding: '10px 16px', cursor: 'pointer', border: 'none', borderBottom: activeTab === tab.key ? '2px solid #1D9E75' : '2px solid transparent', background: 'transparent', color: activeTab === tab.key ? '#0F6E56' : '#888780', fontWeight: activeTab === tab.key ? 500 : 400, fontFamily: 'inherit', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span>{tab.icon}</span>{tab.label}
-          </button>
-        ))}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '220px 1fr',
+          minHeight: 'calc(100vh - 72px)'
+        }}
+      >
+        {/* Sidebar kiri */}
+        <aside
+          style={{
+            background: '#F8FCFA',
+            borderRight: '0.5px solid #D3D1C7',
+            padding: '20px 14px'
+          }}
+        >
+          <div
+            style={{
+              fontSize: 11,
+              color: '#888780',
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
+              marginBottom: 14,
+              paddingLeft: 8
+            }}
+          >
+            Navigasi
+          </div>
+
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 6
+            }}
+          >
+            {TABS.map((tab) => {
+              const active = activeTab === tab.key;
+
+              return (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  style={{
+                    width: '100%',
+                    border: 'none',
+                    cursor: 'pointer',
+                    borderRadius: 10,
+                    padding: '12px 14px',
+                    textAlign: 'left',
+                    fontSize: 14,
+                    fontFamily: 'inherit',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    background: active
+                      ? '#DDF4EA'
+                      : 'transparent',
+                    color: active
+                      ? '#15803D'
+                      : '#4B5563',
+                    fontWeight: active ? 600 : 400
+                  }}
+                >
+                  <span>{tab.icon}</span>
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+        </aside>
+
+        {/* Content kanan */}
+        <main
+          style={{
+            padding: '18px 24px'
+          }}
+        >
+          {activeTab === 'beranda' && (
+            <TabBeranda
+              statusData={statusData}
+              loading={loading}
+            />
+          )}
+
+          {activeTab === 'grafik' && (
+            <GrafikTren baseUrl={BASE_URL} />
+          )}
+
+          {activeTab === 'anomali' && (
+            <DeteksiAnomali baseUrl={BASE_URL} />
+          )}
+
+          {activeTab === 'prediksi' && (
+            <Prediksi />
+          )}
+
+          {activeTab === 'data' && (
+            <TabPlaceholder
+              icon="🗄️"
+              label="Kondisi Data"
+            />
+          )}
+
+          {activeTab === 'edukasi' && <Edukasi />}
+        </main>
       </div>
 
-      <div style={{ padding: '16px 24px' }}>
-        {activeTab === 'beranda'  && <TabBeranda statusData={statusData} loading={loading} />}
-        {activeTab === 'grafik'   && <GrafikTren baseUrl={BASE_URL} />}
-        {activeTab === 'anomali'  && <TabPlaceholder icon="⚠️" label="Anomali" />}
-        {activeTab === 'prediksi' && <TabPlaceholder icon="🔮" label="Prediksi" />}
-        {activeTab === 'data'     && <TabPlaceholder icon="🗄️" label="Kondisi Data" />}
-        {activeTab === 'edukasi' && <Edukasi />}
-      </div>
 
       <div style={{ padding: '8px 24px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span style={{ fontSize: 11, color: '#888780' }}>🔄 Auto-refresh tiap 60 menit · Sumber data: Open-Meteo Air Quality API</span>

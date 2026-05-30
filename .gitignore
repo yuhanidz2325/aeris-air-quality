@@ -1,3 +1,20 @@
 node_modules
 dist
 .env
+# Lingkungan Virtual & Python
+venv/
+__pycache__/
+*.pyc
+
+# MLFlow
+mlruns/
+
+# Log & Konfigurasi
+reports/ingestion.log
+docker-compose.env
+.env
+
+# Folder Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.DS_Store

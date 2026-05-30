@@ -1,4 +1,3 @@
-```markdown
 # 🌫️ Aeris - Sistem Deteksi Anomali & Prediksi Kualitas Udara
 
 [![Python 3.11](https://img.shields.io/badge/Python-3.11-blue.svg)](https://www.python.org/)
@@ -477,4 +476,3 @@ VALUES ('Surabaya', -7.2575, 112.7521);
 ---
 
 > *"Udara Bersih, Masa Depan Cerah - Deteksi Dini untuk Langkah Cerdas"*
-```

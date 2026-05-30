@@ -5,6 +5,7 @@ import TrendChart from './components/TrendChart';
 import GrafikTren from './components/GrafikTren';
 import Edukasi from './components/Edukasi';
 import Prediksi from './components/Prediksi';
+import KondisiData from './components/KondisiData';
 import DeteksiAnomali from './components/DeteksiAnomali';
 
 const BASE_URL = "https://web-production-8b53f.up.railway.app";
@@ -332,10 +333,7 @@ function App() {
           )}
 
           {activeTab === 'data' && (
-            <TabPlaceholder
-              icon="🗄️"
-              label="Kondisi Data"
-            />
+            <KondisiData lastUpdate={lastUpdate} />
           )}
 
           {activeTab === 'edukasi' && <Edukasi />}

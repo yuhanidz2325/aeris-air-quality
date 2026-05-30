@@ -31,8 +31,13 @@ function DeteksiAnomali({ baseUrl }) {
 
     const fetchHistory = async () => {
       try {
+        // 1. Buat rentang waktu 24 jam terakhir menggunakan ISO format agar presisi
+        const endDate = new Date().toISOString();
+        const startDate = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+
+        // 2. Gunakan endpoint yang sama dengan komponen grafik lainnya
         const response = await fetch(
-          `${baseUrl}/history/${selectedParameter}?hours=24`
+          `${baseUrl}/history/surabaya?start_date=${startDate}&end_date=${endDate}&parameter=${selectedParameter}`
         );
 
         if (!response.ok) {
@@ -41,18 +46,15 @@ function DeteksiAnomali({ baseUrl }) {
 
         const json = await response.json();
 
-        console.log('PARAMETER:', selectedParameter);
-        console.log('HISTORY ANOMALI:', json);
+        // 3. Tangani format Array langsung dari API
+        const data = Array.isArray(json) ? json : (json.history || json.data || json.hourly || []);
 
-        const data =
-          json.history ||
-          json.data ||
-          json.hourly ||
-          [];
-
+        // 4. Map data untuk Recharts
         const formatted = data.map((item) => ({
+          // Sesuaikan pemotongan string jika format tanggal dari database adalah "YYYY-MM-DD HH:mm:ss"
+          // Slice(11, 16) mengambil bagian "HH:mm"
           timestamp: item.timestamp?.slice(11, 16),
-          value: item.value || 0
+          value: item.value ?? item[selectedParameter] ?? 0
         }));
 
         setHistoryData(formatted);

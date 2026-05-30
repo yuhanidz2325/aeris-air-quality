@@ -62,15 +62,13 @@ Kualitas udara di perkotaan seperti Surabaya sangat dinamis dan memiliki pola ya
 **Solusi Aeris:** 3 model terpisah per parameter polutan = 15 model total yang bekerja secara otomatis sesuai jam.
 
 ---
-
 ## 👥 Tim Pengembang
 
 | No | Peran | Nama | NRP | Tanggung Jawab |
 |:---|:---|:---|:---|:---|
 | 1 | **Data & ML Engineer** | Linda Anggara Wati | 3324600008 | EDA, Feature Engineering, PyCaret (15 model), Isolation Forest |
-| 2 | **Backend & DevOps** | Yuhanidz Habibah | 3324600020 | Database, FastAPI, Docker, Deployment, Retraining System |
-| 3 | **Frontend & Dokumentasi** | Intan Azzuhra Permadani | 3324600028 | Dashboard UI/UX, Laporan, Presentasi, Visualisasi |
-
+| 2 | **Backend & DevOps Engineer** | Yuhanidz Habibah | 3324600020 | Database, Backend API, Deployment, Retraining System |
+| 3 | **UI/UX Designer & Frontend Developer** | Intan Azzuhra Permadani | 3324600028 | UI/UX Design, Frontend Dashboard, Visualisasi Data |
 ---
 
 ## ✨ Fitur Unggulan
@@ -412,44 +410,6 @@ VALUES ('Surabaya', -7.2575, 112.7521);
 | `POST` | `/retrain` | Manual trigger retraining |
 
 > 📖 **Interactive API Docs:** `http://localhost:8000/docs`
-
----
-
-## 📅 Timeline Pengerjaan (5 Minggu)
-
-| Minggu | Tanggal | Fokus Utama |
-|:---:|:---|:---|
-| **1** | 27 Apr - 3 Mei | Setup Infrastruktur, EDA Awal, BAB I |
-| **2** | 4 Mei - 10 Mei | Feature Engineering, ISPU, Segmentasi Waktu |
-| **3** | 11 Mei - 17 Mei | PyCaret 15 Model & Backend API |
-| **4** | 18 Mei - 24 Mei | Docker Deployment & Frontend Final |
-| **5** | 25 Mei - 31 Mei | Finalisasi Laporan & Presentasi |
-
-### Milestone Penting
-
-| Tanggal | Milestone |
-|:---|:---|
-| 27 April | Kickoff - repo dibuat |
-| 3 Mei | EDA selesai, data Jan-Apr masuk DB |
-| 10 Mei | Feature engineering selesai |
-| 17 Mei | 15 model PyCaret selesai |
-| 24 Mei | Docker compose berhasil |
-| 31 Mei | Presentasi final |
-
----
-
-## 📊 Pemetaan Tugas ke Rubrik Penilaian
-
-| Komponen | Bobot | Penanggung Jawab |
-|:---|:---:|:---|
-| Code Readability | 15% | Semua anggota |
-| Problem Understanding | 10% | Intan + Linda |
-| Data Preprocessing & FE | 20% | Linda + Yuhanidz |
-| EDA | 5% | Linda |
-| Fine Tuning Model | 20% | Linda + Yuhanidz |
-| Deployment | 15% | Yuhanidz + Intan |
-| Slide Content | 5% | Intan |
-| Communication Skills | 10% | Semua anggota |
 
 ---
 

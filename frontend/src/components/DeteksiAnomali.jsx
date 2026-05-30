@@ -29,34 +29,39 @@ function DeteksiAnomali({ baseUrl }) {
       }
     }
 
-    async function fetchHistory() {
+    const fetchHistory = async () => {
       try {
-        const endDate = new Date().toISOString().split('T')[0];
-
-        const startDate = new Date(
-          Date.now() - 24 * 60 * 60 * 1000
-        )
-          .toISOString()
-          .split('T')[0];
-
-        const res = await fetch(
-          `${baseUrl}/history/surabaya?start_date=${startDate}&end_date=${endDate}&parameter=${selectedParameter}`
+        const response = await fetch(
+          `${baseUrl}/history/${selectedParameter}?hours=24`
         );
 
-        const json = await res.json();
+        if (!response.ok) {
+          throw new Error(`HTTP error ${response.status}`);
+        }
 
-        const formatted = Array.isArray(json)
-          ? json.map((item) => ({
-              timestamp: item.timestamp?.slice(11, 16),
-              value: item.value ?? item[selectedParameter] ?? 0
-            }))
-          : [];
+        const json = await response.json();
+
+        console.log('PARAMETER:', selectedParameter);
+        console.log('HISTORY ANOMALI:', json);
+
+        const data =
+          json.history ||
+          json.data ||
+          json.hourly ||
+          [];
+
+        const formatted = data.map((item) => ({
+          timestamp: item.timestamp?.slice(11, 16),
+          value: item.value || 0
+        }));
 
         setHistoryData(formatted);
+
       } catch (error) {
         console.error('Gagal mengambil history:', error);
+        setHistoryData([]);
       }
-    }
+    };
 
     fetchStatus();
     fetchHistory();
@@ -104,6 +109,24 @@ function DeteksiAnomali({ baseUrl }) {
     o3: 'O₃'
   };
 
+  const dominantPollutant =
+    anomalyItems.length > 0
+      ? [...anomalyItems].sort((a, b) => b.value - a.value)[0]
+      : null;
+
+  const activeAnomaly = anomalyItems.find(
+    (item) =>
+      item.category === 'Tidak Sehat' ||
+      item.category === 'Sangat Tidak Sehat' ||
+      item.category === 'Berbahaya'
+  );
+
+  const anomalyInsight = activeAnomaly
+    ? `Berdasarkan data pemantauan terbaru, anomali terdeteksi pada parameter ${activeAnomaly.parameter.toUpperCase()} dengan nilai ${Math.round(
+        activeAnomaly.value
+      )}. Nilai ini merupakan konsentrasi tertinggi dibanding polutan lainnya pada waktu pengamatan saat ini. Sementara parameter lain masih berada pada rentang normal dan tidak menunjukkan lonjakan signifikan. Hal ini menunjukkan bahwa anomali yang terjadi saat ini didominasi oleh peningkatan ${activeAnomaly.parameter.toUpperCase()}.`
+    : `Berdasarkan data pemantauan terbaru, tidak ditemukan anomali signifikan pada seluruh parameter kualitas udara. Seluruh polutan masih berada pada rentang normal dan relatif stabil berdasarkan pembacaan terakhir.`;
+    
   return (
     <div
       style={{
@@ -392,6 +415,106 @@ function DeteksiAnomali({ baseUrl }) {
           </div>
         </div>
       </div>
+
+      <div
+        style={{
+          background: '#fff',
+          border: '0.5px solid #D3D1C7',
+          borderRadius: 12,
+          padding: 20
+        }}
+      >
+        <h2 style={{ marginBottom: 14 }}>
+          🔍 Faktor Penyebab Anomali
+        </h2>
+
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: 12,
+            marginBottom: 16
+          }}
+        >
+          <div
+            style={{
+              background: '#F7F7F7',
+              borderRadius: 10,
+              padding: 16
+            }}
+          >
+            <div style={{ fontSize: 12, color: '#666' }}>
+              Polutan Dominan
+            </div>
+            <strong style={{ fontSize: 22 }}>
+              {dominantPollutant?.parameter?.toUpperCase() || '-'}
+            </strong>
+          </div>
+
+          <div
+            style={{
+              background: '#F7F7F7',
+              borderRadius: 10,
+              padding: 16
+            }}
+          >
+            <div style={{ fontSize: 12, color: '#666' }}>
+              Nilai Saat Ini
+            </div>
+            <strong style={{ fontSize: 22 }}>
+              {dominantPollutant
+                ? Math.round(dominantPollutant.value)
+                : '-'}
+            </strong>
+          </div>
+
+          <div
+            style={{
+              background: '#F7F7F7',
+              borderRadius: 10,
+              padding: 16
+            }}
+          >
+            <div style={{ fontSize: 12, color: '#666' }}>
+              Status
+            </div>
+            <strong
+              style={{
+                fontSize: 22,
+                color: activeAnomaly ? '#F59E0B' : '#1D9E75'
+              }}
+            >
+              {activeAnomaly ? 'Anomali' : 'Normal'}
+            </strong>
+          </div>
+
+          <div
+            style={{
+              background: '#F7F7F7',
+              borderRadius: 10,
+              padding: 16
+            }}
+          >
+            <div style={{ fontSize: 12, color: '#666' }}>
+              Jumlah Polutan Dipantau
+            </div>
+            <strong style={{ fontSize: 22 }}>
+              {anomalyItems.length}
+            </strong>
+          </div>
+        </div>
+
+        <p
+          style={{
+            lineHeight: 1.8,
+            color: '#475569',
+            margin: 0
+          }}
+        >
+          {anomalyInsight}
+        </p>
+      </div>
+
     </div>
   );
 }

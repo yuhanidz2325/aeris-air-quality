@@ -7,7 +7,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-lightblue.svg)](https://www.postgresql.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**Kelompok Aeris | D4 Teknik Informatika PENS 2026 | Capstone Project**
+**Kelompok Aeris | D4 Sains Data Terapan PENS 2026 | Capstone Project**
 
 > Sistem cerdas untuk memprediksi polusi udara 3 jam ke depan dan mendeteksi anomali kualitas udara secara real-time, mengacu pada standar resmi ISPU KLHK dengan pendekatan *time-segmented machine learning*.
 

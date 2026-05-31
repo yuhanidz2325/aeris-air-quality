@@ -305,25 +305,24 @@ function GrafikTren({ baseUrl }) {
             byTimestamp[ts][polutanAktif] = item.value ?? 0;
           });
 
-          if (viewMode === 'overlay') {
-            const otherKeys = POLLUTANT_KEYS.filter(k => k !== polutanAktif);
-            const otherResults = await Promise.all(otherKeys.map(fetchOne));
+          // Selalu fetch semua polutan (untuk ringkasan + overlay)
+          const otherKeys = POLLUTANT_KEYS.filter(k => k !== polutanAktif);
+          const otherResults = await Promise.all(otherKeys.map(fetchOne));
 
-            otherKeys.forEach((param, idx) => {
-              otherResults[idx].forEach(item => {
-                const ts = item.timestamp
-                  ? item.timestamp.slice(5, 16).replace('T', ' ')
-                  : '';
-                if (!byTimestamp[ts]) {
-                  byTimestamp[ts] = {
-                    timestamp: ts,
-                    pm25: 0, pm10: 0, co: 0, no2: 0, o3: 0,
-                  };
-                }
-                byTimestamp[ts][param] = item.value ?? 0;
-              });
+          otherKeys.forEach((param, idx) => {
+            otherResults[idx].forEach(item => {
+              const ts = item.timestamp
+                ? item.timestamp.slice(5, 16).replace('T', ' ')
+                : '';
+              if (!byTimestamp[ts]) {
+                byTimestamp[ts] = {
+                  timestamp: ts,
+                  pm25: 0, pm10: 0, co: 0, no2: 0, o3: 0,
+                };
+              }
+              byTimestamp[ts][param] = item.value ?? 0;
             });
-          }
+          });
 
           const formatted = Object.values(byTimestamp).sort((a, b) =>
             a.timestamp.localeCompare(b.timestamp)

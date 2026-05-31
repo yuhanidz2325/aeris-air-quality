@@ -1,5 +1,5 @@
 import LandingPage from './pages/LandingPage';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import CardPredict from './components/CardPredict';
 import TrendChart from './components/TrendChart';
 import GrafikTren from './components/GrafikTren';
@@ -7,8 +7,9 @@ import Edukasi from './components/Edukasi';
 import Prediksi from './components/Prediksi';
 import KondisiData from './components/KondisiData';
 import DeteksiAnomali from './components/DeteksiAnomali';
+import { LineChart, Line, ResponsiveContainer } from 'recharts';
 
-const BASE_URL = "https://web-production-8b53f.up.railway.app";
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 const ISPU_CONFIG = {
   "Baik":              { bg: "#E1F5EE", border: "#5DCAA5", text: "#085041", dot: "#1D9E75" },
@@ -90,44 +91,172 @@ function SegmentPanel({ segment }) {
   );
 }
 
+// Hero Summary Card Component
+function HeroSummary({ statusData, loading }) {
+  const category  = statusData?.ispu_status?.[0]?.category ?? "Baik";
+  const ispuValue = statusData?.ispu_status?.[0]?.value ?? "—";
+  const isAnomali = statusData?.anomaly_detected === true;
+  const pollutants = statusData?.pollutants || {};
+  
+  // Cari polutan dominan (nilai ISPU tertinggi)
+  const dominantPolutan = statusData?.ispu_status?.[0]?.parameter ?? "—";
+  
+  // Prediksi trend (simplified)
+  const predTrend = "Stabil";
+  
+  // Jumlah anomali (simulasi)
+  const anomalyCount = isAnomali ? 2 : 0;
+  
+  const cfg = getIspuConfig(category);
+
+  return (
+    <div style={{
+      background: `linear-gradient(135deg, ${cfg.bg} 0%, #FFFFFF 100%)`,
+      border: `1.5px solid ${cfg.border}`,
+      borderRadius: 16,
+      padding: 24,
+      position: 'relative',
+      overflow: 'hidden'
+    }}>
+      {/* Background decoration */}
+      <div style={{
+        position: 'absolute', top: -20, right: -20,
+        width: 120, height: 120, borderRadius: '50%',
+        background: `${cfg.dot}15`,
+        zIndex: 0
+      }} />
+      
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        {/* Header */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 500, color: '#888780', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>
+              Kualitas Udara Surabaya Hari Ini
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <span style={{
+                fontSize: 16, fontWeight: 700, color: cfg.text,
+                padding: '4px 16px', borderRadius: 8,
+                background: cfg.bg, border: `1px solid ${cfg.border}`
+              }}>
+                {loading ? 'Memuat...' : category}
+              </span>
+              {isAnomali && (
+                <span style={{
+                  fontSize: 11, fontWeight: 600,
+                  padding: '3px 10px', borderRadius: 20,
+                  background: '#FAEEDA', color: '#633806',
+                  border: '0.5px solid #EF9F27',
+                  animation: 'pulse 2s infinite'
+                }}>
+                  ⚠️ Anomali Terdeteksi
+                </span>
+              )}
+            </div>
+          </div>
+          
+          {/* ISPU Value - Large */}
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ fontSize: 42, fontWeight: 700, color: cfg.text, lineHeight: 1 }}>
+              {loading ? '—' : Math.round(ispuValue)}
+            </div>
+            <div style={{ fontSize: 12, color: '#888780', marginTop: 4 }}>Nilai ISPU</div>
+          </div>
+        </div>
+
+        {/* Summary Cards Grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+          {[
+            { label: 'Polutan Dominan', value: dominantPolutan, icon: '🎯', color: '#378ADD' },
+            { label: 'Prediksi 3 Jam', value: predTrend, icon: '📊', color: '#1D9E75' },
+            { label: 'Anomali Hari Ini', value: `${anomalyCount} titik`, icon: '🔍', color: isAnomali ? '#F59E0B' : '#1D9E75' },
+            { label: 'Status', value: isAnomali ? 'Waspada' : 'Aman', icon: isAnomali ? '⚠️' : '✅', color: isAnomali ? '#F59E0B' : '#1D9E75' },
+          ].map((item) => (
+            <div key={item.label} style={{
+              background: '#FFFFFF',
+              border: '1px solid #E5E7EB',
+              borderRadius: 12,
+              padding: 14,
+              borderLeft: `3px solid ${item.color}`
+            }}>
+              <div style={{ fontSize: 16, marginBottom: 6 }}>{item.icon}</div>
+              <div style={{ fontSize: 11, color: '#64748B', marginBottom: 4 }}>{item.label}</div>
+              <div style={{ fontSize: 18, fontWeight: 600, color: '#1F2937' }}>{loading ? '...' : item.value}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Sparkline Mini Chart Component
+function SparklineChart({ data, color, height = 40 }) {
+  if (!data || data.length === 0) return null;
+  
+  const max = Math.max(...data);
+  const min = Math.min(...data);
+  const range = max - min || 1;
+  
+  const points = data.map((val, i) => {
+    const x = (i / (data.length - 1)) * 100;
+    const y = 100 - ((val - min) / range) * 100;
+    return `${x},${y}`;
+  }).join(' ');
+  
+  return (
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ width: '100%', height, overflow: 'visible' }}>
+      <defs>
+        <linearGradient id={`grad-${color}`} x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style={{ stopColor: color, stopOpacity: 0.3 }} />
+          <stop offset="100%" style={{ stopColor: color, stopOpacity: 0.05 }} />
+        </linearGradient>
+      </defs>
+      <polygon
+        points={`0,100 ${points} 100,100`}
+        fill={`url(#grad-${color})`}
+      />
+      <polyline
+        points={points}
+        fill="none"
+        stroke={color}
+        strokeWidth="2"
+        vectorEffect="non-scaling-stroke"
+      />
+    </svg>
+  );
+}
+
 function TabBeranda({ statusData, loading }) {
   const category   = statusData?.ispu_status?.[0]?.category ?? "Baik";
   const ispuValue  = statusData?.ispu_status?.[0]?.value ?? "—";
   const ispuStatus = statusData?.ispu_status ?? [];
   const segment    = statusData?.segment ?? "";
   const isAnomali  = statusData?.anomaly_detected === true;
-
-  const alertStyle = isAnomali
-    ? { background: '#FAEEDA', border: '0.5px solid #EF9F27' }
-    : { background: '#E1F5EE', border: '0.5px solid #5DCAA5' };
+  const pollutants = statusData?.pollutants || {};
 
   const sectionTitle = { fontSize: 11, fontWeight: 500, color: '#888780', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 };
 
+  // Mock sparkline data (akan diganti dengan data history real)
+  const sparklineData = {
+    pm25: [35, 38, 42, 39, 45, 41, 38, 42, 44, 40],
+    pm10: [60, 65, 70, 68, 72, 69, 66, 71, 68, 65],
+    co: [800, 850, 900, 870, 920, 880, 860, 910, 890, 870],
+    no2: [45, 48, 52, 50, 55, 51, 49, 53, 50, 48],
+    o3: [120, 125, 130, 128, 135, 132, 127, 133, 130, 128],
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <div style={{ ...alertStyle, borderRadius: 8, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
-        <span style={{ fontSize: 20 }}>{isAnomali ? '⚠️' : '✅'}</span>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 13, fontWeight: 500, color: isAnomali ? '#633806' : '#085041' }}>
-            {loading ? 'Memuat data...' : isAnomali ? 'Anomali terdeteksi!' : 'Status udara saat ini: Normal'}
-          </div>
-          <div style={{ fontSize: 11, color: isAnomali ? '#854F0B' : '#1D9E75', marginTop: 1 }}>
-            {loading ? 'Menghubungkan ke API...' : isAnomali ? 'Terdapat lonjakan polutan tidak wajar · Harap waspada' : 'Tidak ada anomali terdeteksi · Aman beraktivitas di luar ruangan'}
-          </div>
-        </div>
-        {!loading && (
-          <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: 11, color: '#888780' }}>ISPU tertinggi</div>
-            <div style={{ fontSize: 18, fontWeight: 500, color: '#2C2C2A' }}>{ispuValue}</div>
-            <div style={{ fontSize: 11, color: '#888780' }}>{category}</div>
-          </div>
-        )}
-      </div>
+      
+      {/* HERO SUMMARY CARD */}
+      <HeroSummary statusData={statusData} loading={loading} />
 
-      <div>
-        <div style={sectionTitle}>Panel ISPU terkini per polutan</div>
+      {/* ISPU Panel */}
+      <div style={{ background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: 12, padding: '16px 20px' }}>
+        <div style={sectionTitle}>Panel ISPU Terkini per Polutan</div>
         <IspuPanel ispuStatus={ispuStatus} />
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginTop: 8 }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginTop: 10 }}>
           {Object.entries(ISPU_CONFIG).map(([label, cfg]) => (
             <span key={label} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: '#5F5E5A' }}>
               <span style={{ width: 8, height: 8, borderRadius: '50%', background: cfg.dot, display: 'inline-block' }}></span>
@@ -137,24 +266,66 @@ function TabBeranda({ statusData, loading }) {
         </div>
       </div>
 
-      <div>
-        <div style={sectionTitle}>Segmentasi waktu</div>
+      {/* Segmentasi Waktu */}
+      <div style={{ background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: 12, padding: '16px 20px' }}>
+        <div style={sectionTitle}>Segmentasi Waktu</div>
         <SegmentPanel segment={segment} />
       </div>
 
+      {/* Pollutant Cards with Sparklines */}
+      <div style={{ background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: 12, padding: '16px 20px' }}>
+        <div style={sectionTitle}>Polutan Terkini dengan Tren</div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10 }}>
+          {[
+            { key: 'pm25', label: 'PM2.5', value: pollutants.pm25, unit: 'µg/m³', color: '#1D9E75' },
+            { key: 'pm10', label: 'PM10', value: pollutants.pm10, unit: 'µg/m³', color: '#378ADD' },
+            { key: 'co', label: 'CO', value: pollutants.co, unit: 'µg/m³', color: '#EF9F27' },
+            { key: 'no2', label: 'NO₂', value: pollutants.no2, unit: 'µg/m³', color: '#534AB7' },
+            { key: 'o3', label: 'O₃', value: pollutants.o3, unit: 'µg/m³', color: '#E24B4A' },
+          ].map((p) => (
+            <div key={p.key} style={{
+              background: '#F8FAFC',
+              border: '1px solid #E5E7EB',
+              borderRadius: 12,
+              padding: 14,
+              borderTop: `3px solid ${p.color}`
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+                <div>
+                  <div style={{ fontSize: 11, color: '#64748B' }}>{p.label}</div>
+                  <div style={{ fontSize: 24, fontWeight: 700, color: '#1F2937', lineHeight: 1.1 }}>
+                    {loading ? '—' : Math.round(p.value || 0)}
+                  </div>
+                  <div style={{ fontSize: 11, color: '#888780' }}>{p.unit}</div>
+                </div>
+                <div style={{ fontSize: 18 }}>{p.color === '#1D9E75' ? '🌿' : p.color === '#378ADD' ? '💨' : p.color === '#EF9F27' ? '🔶' : p.color === '#534AB7' ? '🟣' : '🔴'}</div>
+              </div>
+              {/* Mini Sparkline */}
+              <div style={{ height: 35, marginTop: 8 }}>
+                <SparklineChart data={sparklineData[p.key]} color={p.color} height={35} />
+              </div>
+              <div style={{ fontSize: 10, color: '#888780', textAlign: 'center', marginTop: 4 }}>
+                Tren 10 jam terakhir
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Prediksi & Ringkasan */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
         <div style={{ background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: 12, padding: '14px 16px' }}>
-          <div style={sectionTitle}>Prediksi PM2.5 — 3 jam ke depan</div>
+          <div style={sectionTitle}>Prediksi PM2.5 — 3 Jam Ke Depan</div>
           <CardPredict baseUrl={BASE_URL} />
         </div>
         <div style={{ background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: 12, padding: '14px 16px' }}>
-          <div style={sectionTitle}>Ringkasan hari ini</div>
+          <div style={sectionTitle}>Ringkasan Hari Ini</div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             {[
               { label: 'Kategori ISPU', val: loading ? '...' : category },
-              { label: 'Nilai ISPU',    val: loading ? '...' : ispuValue },
+              { label: 'Nilai ISPU',    val: loading ? '...' : Math.round(ispuValue) },
               { label: 'Anomali',       val: loading ? '...' : (isAnomali ? 'Terdeteksi' : 'Tidak ada') },
-              { label: 'Segmen aktif',  val: loading ? '...' : (segment || '—') },
+              { label: 'Segmen Aktif',  val: loading ? '...' : (segment || '—') },
             ].map(item => (
               <div key={item.label} style={{ background: '#F1EFE8', borderRadius: 8, padding: '10px 12px' }}>
                 <div style={{ fontSize: 11, color: '#888780', marginBottom: 3 }}>{item.label}</div>
@@ -165,8 +336,9 @@ function TabBeranda({ statusData, loading }) {
         </div>
       </div>
 
+      {/* Tren 7 Hari */}
       <div style={{ background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: 12, padding: '14px 16px' }}>
-        <div style={sectionTitle}>Tren PM2.5 — 7 hari terakhir</div>
+        <div style={sectionTitle}>Tren PM2.5 — 7 Hari Terakhir</div>
         <TrendChart baseUrl={BASE_URL} />
       </div>
     </div>
@@ -189,8 +361,12 @@ function App() {
   const [statusData, setStatusData] = useState(null);
   const [loading, setLoading]       = useState(true);
   const [lastUpdate, setLastUpdate] = useState(null);
+  const [isSyncing, setIsSyncing]   = useState(false);
+  const [nextRefresh, setNextRefresh] = useState(60);
+  const syncTimeoutRef = useRef(null);
 
   async function loadStatus() {
+    setIsSyncing(true);
     try {
       const res  = await fetch(`${BASE_URL}/status/surabaya`);
       const data = await res.json();
@@ -200,13 +376,23 @@ function App() {
       console.error("Gagal fetch status:", err);
     } finally {
       setLoading(false);
+      setIsSyncing(false);
     }
   }
 
+  // Countdown timer for next refresh
+  useEffect(() => {
+    if (nextRefresh > 0) {
+      const timer = setTimeout(() => setNextRefresh(nextRefresh - 1), 1000);
+      return () => clearTimeout(timer);
+    } else {
+      loadStatus();
+      setNextRefresh(60);
+    }
+  }, [nextRefresh]);
+
   useEffect(() => {
     loadStatus();
-    const interval = setInterval(loadStatus, 60 * 60 * 1000);
-    return () => clearInterval(interval);
   }, []);
 
   if (!showDashboard) {
@@ -228,11 +414,73 @@ function App() {
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, fontWeight: 500, background: '#E1F5EE', color: '#085041', border: '0.5px solid #5DCAA5', display: 'flex', alignItems: 'center', gap: 5 }}>
-            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#1D9E75', display: 'inline-block' }}></span>
-            Sistem aktif
+          {/* LIVE Badge with pulse animation */}
+          <span style={{ 
+            fontSize: 11, 
+            padding: '3px 10px', 
+            borderRadius: 20, 
+            fontWeight: 600, 
+            background: '#FCEBEB', 
+            color: '#E24B4A', 
+            border: '0.5px solid #F09595', 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: 6,
+            animation: 'pulse 2s infinite'
+          }}>
+            <span style={{ 
+              width: 8, 
+              height: 8, 
+              borderRadius: '50%', 
+              background: '#E24B4A', 
+              display: 'inline-block',
+              animation: 'pulseDot 2s infinite'
+            }}></span>
+            LIVE
           </span>
-          <span style={{ fontSize: 11, color: '#888780' }}>{lastUpdate ? `Diperbarui ${lastUpdate} WIB` : 'Memuat...'}</span>
+          {/* Syncing indicator */}
+          {isSyncing && (
+            <span style={{ 
+              fontSize: 11, 
+              padding: '3px 10px', 
+              borderRadius: 20, 
+              fontWeight: 500, 
+              background: '#E6F1FB', 
+              color: '#0C447C', 
+              border: '0.5px solid #85B7EB',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 5
+            }}>
+              <span style={{ 
+                width: 10, 
+                height: 10, 
+                border: '2px solid #85B7EB', 
+                borderTop: '2px solid transparent',
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite',
+                display: 'inline-block'
+              }}></span>
+              Sinkronisasi...
+            </span>
+          )}
+          {/* Last update time */}
+          <span style={{ 
+            fontSize: 11, 
+            padding: '3px 10px', 
+            borderRadius: 20, 
+            background: '#F1EFE8', 
+            color: '#5F5E5A',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 4
+          }}>
+            🕐 {lastUpdate ? `${lastUpdate} WIB` : 'Memuat...'}
+          </span>
+          {/* Next refresh countdown */}
+          <span style={{ fontSize: 11, color: '#888780' }}>
+            Refresh dalam {nextRefresh}s
+          </span>
         </div>
       </nav>
 

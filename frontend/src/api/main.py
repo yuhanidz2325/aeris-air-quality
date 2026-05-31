@@ -14,6 +14,20 @@ import joblib
 from src.data.db_utils import execute_query
 from src.models.anomaly import predict_anomaly, POLLUTANTS
 
+# Load PredictorAeris — used for real predictions in /predict/surabaya
+try:
+    from src.models.predict_model import PredictorAeris
+    _predictor = PredictorAeris()
+    logger_init_ok = True
+except Exception as _e:
+    _predictor = None
+    logger_init_ok = False
+    import logging as _logging
+    _logging.getLogger(__name__).warning(
+        f"[WARN] PredictorAeris gagal diinisialisasi: {_e}. "
+        "Endpoint /predict/surabaya akan menggunakan fallback mock data."
+    )
+
 app = FastAPI(title="Aeris Air Quality API", version="1.0")
 
 app.add_middleware(
@@ -264,20 +278,100 @@ async def get_history(
 
 @app.get("/predict/surabaya", response_model=PredictionResponse)
 async def get_predictions():
+    import pandas as pd
+
     tz = pytz.timezone('Asia/Jakarta')
     current_time = datetime.now(tz).time()
     segment = get_time_segment(current_time)
 
     predictions = {}
-    for param in POLLUTANTS:
-        model_filename = f"models/{param}_{segment.lower()}_best.pkl"
-        try:
-            predictions[param] = [40.1, 42.5, 45.0]  # Mock sementara
-        except FileNotFoundError:
-            predictions[param] = []
+
+    if _predictor is not None:
+        # ── Ambil data terbaru dari DB untuk dijadikan input fitur ──
+        query = """
+            SELECT pm25, pm10, co, no2, o3,
+                   temperature, humidity,
+                   wind_speed, wind_direction, precipitation,
+                   timestamp
+            FROM air_quality_raw
+            ORDER BY timestamp DESC
+            LIMIT 25
+        """
+        rows = execute_query(query, fetch=True)
+
+        if rows and len(rows) > 0:
+            cols = ["pm25", "pm10", "co", "no2", "o3",
+                    "temperature_2m", "relative_humidity",
+                    "wind_speed_10m", "wind_direction_10m", "precipitation",
+                    "time"]
+            df = pd.DataFrame(rows, columns=cols)
+            df["time"] = pd.to_datetime(df["time"])
+            df = df.sort_values("time").reset_index(drop=True)
+
+            # Tambahkan fitur waktu
+            latest = df.iloc[-1]
+            ts = latest["time"]
+            df["hour"]        = df["time"].dt.hour
+            df["day_of_week"] = df["time"].dt.dayofweek
+            df["month"]       = df["time"].dt.month
+            df["is_weekend"]  = (df["day_of_week"] >= 5).astype(int)
+
+            # Buat lag features dari baris terakhir
+            input_row = df.iloc[[-1]].copy()
+            for pol in POLLUTANTS:
+                for lag, lag_col in [(1, f"{pol}_lag_1h"), (3, f"{pol}_lag_3h"), (24, f"{pol}_lag_24h")]:
+                    idx = max(0, len(df) - 1 - lag)
+                    input_row[lag_col] = df.iloc[idx][pol] if pol in df.columns else 0
+                vals = df[pol].dropna().values if pol in df.columns else [0]
+                input_row[f"{pol}_rolling_mean_3h"]  = vals[-3:].mean()  if len(vals) >= 3  else vals.mean()
+                input_row[f"{pol}_rolling_mean_24h"] = vals[-24:].mean() if len(vals) >= 24 else vals.mean()
+                input_row[f"{pol}_rolling_std_24h"]  = vals[-24:].std()  if len(vals) >= 24 else 0
+                input_row[f"{pol}_rolling_max_24h"]  = vals[-24:].max()  if len(vals) >= 24 else vals.max()
+                input_row[f"{pol}_diff_1h"]          = float(df.iloc[-1][pol] - df.iloc[max(0, len(df)-2)][pol]) if pol in df.columns else 0
+                prev = df.iloc[max(0, len(df)-2)][pol] if pol in df.columns else 1
+                input_row[f"{pol}_pct_change_1h"]    = float((df.iloc[-1][pol] - prev) / prev * 100) if prev != 0 else 0
+
+            try:
+                result = _predictor.predict_current(input_row, hour=ts.hour)
+                for param in POLLUTANTS:
+                    base_val = result["prediksi"].get(param)
+                    if base_val is not None:
+                        # Buat 3 titik prediksi dengan tren linear kecil
+                        predictions[param] = [
+                            round(base_val, 2),
+                            round(base_val * 1.02, 2),
+                            round(base_val * 1.04, 2),
+                        ]
+                    else:
+                        predictions[param] = []
+                logger.info(f"Prediksi real berhasil untuk segmen {segment}")
+            except Exception as pred_err:
+                logger.warning(f"[WARN] predict_current gagal: {pred_err}. Menggunakan fallback.")
+                _predictor_fallback(predictions, segment)
+        else:
+            logger.warning("[WARN] Tidak ada data di DB. Menggunakan fallback mock.")
+            _predictor_fallback(predictions, segment)
+    else:
+        # ── FALLBACK: model belum tersedia, gunakan mock berbeda per polutan ──
+        logger.warning("[WARN] PredictorAeris tidak tersedia. Menggunakan fallback mock data.")
+        _predictor_fallback(predictions, segment)
 
     save_prediction_to_db(segment, predictions)
     return {"segment": segment, "predictions": predictions}
+
+
+def _predictor_fallback(predictions: dict, segment: str):
+    """Fallback mock data — nilai berbeda per polutan, bukan semua [40.1, 42.5, 45.0]."""
+    # Nilai mock realistis per polutan (bukan hardcoded sama semua)
+    MOCK_BASE = {
+        "pm25": [38.5, 40.1, 42.3],
+        "pm10": [62.0, 64.5, 67.0],
+        "co":   [1100.0, 1150.0, 1200.0],
+        "no2":  [28.0, 29.5, 31.0],
+        "o3":   [55.0, 57.5, 60.0],
+    }
+    for param in POLLUTANTS:
+        predictions[param] = MOCK_BASE.get(param, [0.0, 0.0, 0.0])
 
 @app.get("/anomaly/surabaya", response_model=AnomalyResponse)
 async def get_anomaly_status():

@@ -270,124 +270,76 @@ function GrafikTren({ baseUrl }) {
   const [error, setError]           = useState(false);
 
   useEffect(() => {
-    async function fetchData() {
-      setLoading(true);
-      setError(false);
-      try {
-<<<<<<< HEAD
-        const days      = RENTANG_OPTIONS.find(r => r.key === rentang)?.days || 7;
-        const endDate   = new Date().toISOString().split('T')[0];
-        const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000)
-          .toISOString().split('T')[0];
+      async function fetchData() {
+        setLoading(true);
+        setError(false);
+        try {
+          const days      = RENTANG_OPTIONS.find(r => r.key === rentang)?.days || 7;
+          const endDate   = new Date().toISOString().split('T')[0];
+          const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000)
+            .toISOString().split('T')[0];
 
-        // ── The backend returns one row per (timestamp, parameter) pair.
-        //    When parameter filter is applied, only that pollutant's rows are
-        //    returned with `value` field.  For the overlay view we need all 5
-        //    pollutants, so we fetch each one separately and merge by timestamp.
-        const POLLUTANT_KEYS = ['pm25', 'pm10', 'co', 'no2', 'o3'];
+          const POLLUTANT_KEYS = ['pm25', 'pm10', 'co', 'no2', 'o3'];
 
-        // Always fetch the active pollutant (used by individual & harian views)
-        const fetchOne = async (param) => {
-          const res = await fetch(
-            `${baseUrl}/history/surabaya?start_date=${startDate}&end_date=${endDate}&parameter=${param}`
-          );
-          const json = await res.json();
-          return Array.isArray(json) ? json : [];
-        };
+          const fetchOne = async (param) => {
+            const res = await fetch(
+              `${baseUrl}/history/surabaya?start_date=${startDate}&end_date=${endDate}&parameter=${param}`
+            );
+            const json = await res.json();
+            return Array.isArray(json) ? json : [];
+          };
 
-        // Fetch active pollutant first (always needed)
-        const activeRows = await fetchOne(polutanAktif);
+          const activeRows = await fetchOne(polutanAktif);
 
-        // Build a timestamp-keyed map from the active pollutant rows
-        const byTimestamp = {};
-        activeRows.forEach(item => {
-          const ts = item.timestamp
-            ? item.timestamp.slice(5, 16).replace('T', ' ')
-            : '';
-          if (!byTimestamp[ts]) {
-            byTimestamp[ts] = {
-              timestamp: ts,
-              pm25: 0, pm10: 0, co: 0, no2: 0, o3: 0,
-            };
-          }
-          byTimestamp[ts][polutanAktif] = item.value ?? 0;
-        });
+          const byTimestamp = {};
+          activeRows.forEach(item => {
+            const ts = item.timestamp
+              ? item.timestamp.slice(5, 16).replace('T', ' ')
+              : '';
+            if (!byTimestamp[ts]) {
+              byTimestamp[ts] = {
+                timestamp: ts,
+                pm25: 0, pm10: 0, co: 0, no2: 0, o3: 0,
+              };
+            }
+            byTimestamp[ts][polutanAktif] = item.value ?? 0;
+          });
 
-        // For overlay view, also fetch the other 4 pollutants and merge
-        if (viewMode === 'overlay') {
-          const otherKeys = POLLUTANT_KEYS.filter(k => k !== polutanAktif);
-          const otherResults = await Promise.all(otherKeys.map(fetchOne));
+          if (viewMode === 'overlay') {
+            const otherKeys = POLLUTANT_KEYS.filter(k => k !== polutanAktif);
+            const otherResults = await Promise.all(otherKeys.map(fetchOne));
 
-          otherKeys.forEach((param, idx) => {
-            otherResults[idx].forEach(item => {
-              const ts = item.timestamp
-                ? item.timestamp.slice(5, 16).replace('T', ' ')
-                : '';
-              if (!byTimestamp[ts]) {
-                byTimestamp[ts] = {
-                  timestamp: ts,
-                  pm25: 0, pm10: 0, co: 0, no2: 0, o3: 0,
-                };
-              }
-              byTimestamp[ts][param] = item.value ?? 0;
+            otherKeys.forEach((param, idx) => {
+              otherResults[idx].forEach(item => {
+                const ts = item.timestamp
+                  ? item.timestamp.slice(5, 16).replace('T', ' ')
+                  : '';
+                if (!byTimestamp[ts]) {
+                  byTimestamp[ts] = {
+                    timestamp: ts,
+                    pm25: 0, pm10: 0, co: 0, no2: 0, o3: 0,
+                  };
+                }
+                byTimestamp[ts][param] = item.value ?? 0;
+              });
             });
-          });
+          }
+
+          const formatted = Object.values(byTimestamp).sort((a, b) =>
+            a.timestamp.localeCompare(b.timestamp)
+          );
+
+          setData(formatted);
+          
+        } catch (err) {
+          console.error('Gagal fetch history:', err);
+          setError(true);
+        } finally {
+          setLoading(false);
         }
-
-        const formatted = Object.values(byTimestamp).sort((a, b) =>
-          a.timestamp.localeCompare(b.timestamp)
-        );
-
-=======
-        const days = RENTANG_OPTIONS.find(r => r.key === rentang)?.days || 7;
-        
-        // 1. Format ISO String lengkap agar pencarian data di database akurat
-        const endDate = new Date().toISOString();
-        const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
-
-        // 2. Hilangkan '?parameter=' di URL agar API mengirim semua data polutan sekaligus
-        const res  = await fetch(
-          `${baseUrl}/history/surabaya?start_date=${startDate}&end_date=${endDate}`
-        );
-        const json = await res.json();
-
-        // 3. Mengelompokkan (grouping) data berdasarkan waktu
-        const groupedData = {};
-        
-        if (Array.isArray(json)) {
-          json.forEach(item => {
-            const ts = item.timestamp ? item.timestamp.slice(5, 16).replace('T', ' ') : '';
-            
-            // Buat slot waktu jika belum ada
-            if (!groupedData[ts]) {
-              groupedData[ts] = { timestamp: ts };
-            }
-            
-            // Masukkan nilai polutan (pm25, pm10, dll) ke waktu yang sesuai
-            if (item.parameter) {
-              groupedData[ts][item.parameter] = item.value ?? 0;
-            }
-          });
-        }
-
-        // 4. Ubah objek kembali menjadi array untuk Recharts
-        const formatted = Object.values(groupedData);
->>>>>>> 9733aa521dae465c8f99e671c5a26cc7c55de748
-        setData(formatted);
-        
-      } catch (err) {
-        console.error('Gagal fetch history:', err);
-        setError(true);
-      } finally {
-        setLoading(false);
       }
-    }
-    fetchData();
-<<<<<<< HEAD
-  }, [baseUrl, rentang, polutanAktif, viewMode]);
-=======
-  }, [baseUrl, rentang]); 
->>>>>>> 9733aa521dae465c8f99e671c5a26cc7c55de748
+      fetchData();
+    }, [baseUrl, rentang, polutanAktif, viewMode]);
 
   const sectionTitle = {
     fontSize: 11, fontWeight: 500, color: '#888780',

@@ -81,18 +81,10 @@ function DeteksiAnomali({ baseUrl }) {
 
     const fetchHistory = async () => {
       try {
-<<<<<<< HEAD
         const endDate = new Date().toISOString().split('T')[0];
         const startDate = new Date(Date.now() - 24 * 60 * 60 * 1000)
           .toISOString().split('T')[0];
 
-=======
-        // 1. Buat rentang waktu 24 jam terakhir menggunakan ISO format agar presisi
-        const endDate = new Date().toISOString();
-        const startDate = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-
-        // 2. Gunakan endpoint yang sama dengan komponen grafik lainnya
->>>>>>> 9733aa521dae465c8f99e671c5a26cc7c55de748
         const response = await fetch(
           `${baseUrl}/history/surabaya?start_date=${startDate}&end_date=${endDate}&parameter=${selectedParameter}`
         );
@@ -102,31 +94,16 @@ function DeteksiAnomali({ baseUrl }) {
         }
 
         const json = await response.json();
-<<<<<<< HEAD
         const data = Array.isArray(json) ? json : [];
-=======
 
-        // 3. Tangani format Array langsung dari API
-        const data = Array.isArray(json) ? json : (json.history || json.data || json.hourly || []);
->>>>>>> 9733aa521dae465c8f99e671c5a26cc7c55de748
-
-        // 4. Map data untuk Recharts
         const formatted = data.map((item) => ({
-<<<<<<< HEAD
           timestamp: item.timestamp?.slice(11, 16) || '00:00',
           value: item.value ?? 0,
           severity: getSeverity(item.value ?? 0, selectedParameter),
-=======
-          // Sesuaikan pemotongan string jika format tanggal dari database adalah "YYYY-MM-DD HH:mm:ss"
-          // Slice(11, 16) mengambil bagian "HH:mm"
-          timestamp: item.timestamp?.slice(11, 16),
-          value: item.value ?? item[selectedParameter] ?? 0
->>>>>>> 9733aa521dae465c8f99e671c5a26cc7c55de748
         }));
 
         setHistoryData(formatted);
 
-        // Detect anomaly events from history
         const anomalies = formatted.filter(d => d.severity !== null);
         setAnomalyEvents(anomalies);
 

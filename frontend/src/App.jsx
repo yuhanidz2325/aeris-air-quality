@@ -494,29 +494,45 @@ function App() {
         {/* Sidebar kiri */}
         <aside
           style={{
-            background: '#F8FCFA',
-            borderRight: '0.5px solid #D3D1C7',
-            padding: '20px 14px'
+            background: 'linear-gradient(180deg, #F0FDF8 0%, #F8FCFA 60%, #F0F9FF 100%)',
+            borderRight: '1px solid #D1FAE5',
+            borderLeft: '3px solid #16a34a',
+            padding: '24px 12px',
+            position: 'relative',
           }}
         >
+          {/* Subtle top accent line */}
+          <div style={{
+            position: 'absolute',
+            top: 0, left: 0, right: 0,
+            height: 3,
+            background: 'linear-gradient(90deg, #16a34a, #34d399)',
+            borderRadius: '0 0 4px 4px',
+          }} />
+
           <div
             style={{
-              fontSize: 11,
-              color: '#888780',
+              fontSize: 10,
+              color: '#6B7280',
               textTransform: 'uppercase',
-              letterSpacing: '0.06em',
-              marginBottom: 14,
-              paddingLeft: 8
+              letterSpacing: '0.1em',
+              fontWeight: 600,
+              marginBottom: 16,
+              paddingLeft: 10,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
             }}
           >
-            Navigasi
+            <span style={{ width: 16, height: 1.5, background: '#16a34a', display: 'inline-block', borderRadius: 2 }} />
+            Menu
           </div>
 
           <div
             style={{
               display: 'flex',
               flexDirection: 'column',
-              gap: 6
+              gap: 4,
             }}
           >
             {TABS.map((tab) => {
@@ -526,32 +542,90 @@ function App() {
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
+                  onMouseEnter={e => {
+                    if (!active) {
+                      e.currentTarget.style.background = 'rgba(22,163,74,0.07)';
+                      e.currentTarget.style.transform = 'translateX(3px)';
+                      e.currentTarget.style.color = '#15803D';
+                    }
+                  }}
+                  onMouseLeave={e => {
+                    if (!active) {
+                      e.currentTarget.style.background = 'transparent';
+                      e.currentTarget.style.transform = 'translateX(0)';
+                      e.currentTarget.style.color = '#4B5563';
+                    }
+                  }}
                   style={{
                     width: '100%',
                     border: 'none',
                     cursor: 'pointer',
                     borderRadius: 10,
-                    padding: '12px 14px',
+                    padding: '11px 12px',
                     textAlign: 'left',
-                    fontSize: 14,
+                    fontSize: 13.5,
                     fontFamily: 'inherit',
                     display: 'flex',
                     alignItems: 'center',
                     gap: 10,
+                    transition: 'all 0.2s ease',
+                    position: 'relative',
                     background: active
-                      ? '#DDF4EA'
+                      ? 'linear-gradient(135deg, #DCFCE7 0%, #D1FAE5 100%)'
                       : 'transparent',
-                    color: active
-                      ? '#15803D'
-                      : '#4B5563',
-                    fontWeight: active ? 600 : 400
+                    color: active ? '#15803D' : '#4B5563',
+                    fontWeight: active ? 700 : 400,
+                    boxShadow: active
+                      ? '0 1px 4px rgba(22,163,74,0.12), inset 0 0 0 1px rgba(22,163,74,0.2)'
+                      : 'none',
+                    borderLeft: active ? '3px solid #16a34a' : '3px solid transparent',
+                    paddingLeft: active ? '9px' : '12px',
                   }}
                 >
-                  <span>{tab.icon}</span>
-                  {tab.label}
+                  <span style={{
+                    fontSize: 17,
+                    width: 22,
+                    textAlign: 'center',
+                    flexShrink: 0,
+                    filter: active ? 'none' : 'grayscale(20%)',
+                    transition: 'filter 0.2s ease',
+                  }}>
+                    {tab.icon}
+                  </span>
+                  <span style={{ letterSpacing: active ? '0.01em' : 0 }}>
+                    {tab.label}
+                  </span>
+                  {active && (
+                    <span style={{
+                      marginLeft: 'auto',
+                      width: 6,
+                      height: 6,
+                      borderRadius: '50%',
+                      background: '#16a34a',
+                      flexShrink: 0,
+                    }} />
+                  )}
                 </button>
               );
             })}
+          </div>
+
+          {/* Bottom version badge */}
+          <div style={{
+            position: 'absolute',
+            bottom: 16,
+            left: 12,
+            right: 12,
+            padding: '8px 10px',
+            background: 'rgba(22,163,74,0.06)',
+            borderRadius: 8,
+            border: '0.5px solid rgba(22,163,74,0.15)',
+            fontSize: 10,
+            color: '#6B7280',
+            textAlign: 'center',
+            letterSpacing: '0.03em',
+          }}>
+            Aeris v1.0 · PENS 2026
           </div>
         </aside>
 

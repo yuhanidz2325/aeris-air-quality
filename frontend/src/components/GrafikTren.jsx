@@ -274,6 +274,7 @@ function GrafikTren({ baseUrl }) {
       setLoading(true);
       setError(false);
       try {
+<<<<<<< HEAD
         const days      = RENTANG_OPTIONS.find(r => r.key === rentang)?.days || 7;
         const endDate   = new Date().toISOString().split('T')[0];
         const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000)
@@ -337,7 +338,43 @@ function GrafikTren({ baseUrl }) {
           a.timestamp.localeCompare(b.timestamp)
         );
 
+=======
+        const days = RENTANG_OPTIONS.find(r => r.key === rentang)?.days || 7;
+        
+        // 1. Format ISO String lengkap agar pencarian data di database akurat
+        const endDate = new Date().toISOString();
+        const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+
+        // 2. Hilangkan '?parameter=' di URL agar API mengirim semua data polutan sekaligus
+        const res  = await fetch(
+          `${baseUrl}/history/surabaya?start_date=${startDate}&end_date=${endDate}`
+        );
+        const json = await res.json();
+
+        // 3. Mengelompokkan (grouping) data berdasarkan waktu
+        const groupedData = {};
+        
+        if (Array.isArray(json)) {
+          json.forEach(item => {
+            const ts = item.timestamp ? item.timestamp.slice(5, 16).replace('T', ' ') : '';
+            
+            // Buat slot waktu jika belum ada
+            if (!groupedData[ts]) {
+              groupedData[ts] = { timestamp: ts };
+            }
+            
+            // Masukkan nilai polutan (pm25, pm10, dll) ke waktu yang sesuai
+            if (item.parameter) {
+              groupedData[ts][item.parameter] = item.value ?? 0;
+            }
+          });
+        }
+
+        // 4. Ubah objek kembali menjadi array untuk Recharts
+        const formatted = Object.values(groupedData);
+>>>>>>> 9733aa521dae465c8f99e671c5a26cc7c55de748
         setData(formatted);
+        
       } catch (err) {
         console.error('Gagal fetch history:', err);
         setError(true);
@@ -346,7 +383,11 @@ function GrafikTren({ baseUrl }) {
       }
     }
     fetchData();
+<<<<<<< HEAD
   }, [baseUrl, rentang, polutanAktif, viewMode]);
+=======
+  }, [baseUrl, rentang]); 
+>>>>>>> 9733aa521dae465c8f99e671c5a26cc7c55de748
 
   const sectionTitle = {
     fontSize: 11, fontWeight: 500, color: '#888780',

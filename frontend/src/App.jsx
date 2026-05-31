@@ -2,7 +2,7 @@ import LandingPage from './pages/LandingPage';
 import React, { useState, useEffect, useRef } from 'react';
 import CardPredict from './components/CardPredict';
 import TrendChart from './components/TrendChart';
-import GrafikTren from './components/GrafikTren';
+import GrafikTren from './components/GrafikTrenChart';
 import Edukasi from './components/Edukasi';
 import Prediksi from './components/Prediksi';
 import KondisiData from './components/KondisiData';

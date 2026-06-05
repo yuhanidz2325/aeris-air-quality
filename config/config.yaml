@@ -1,0 +1,82 @@
+# config/config.yaml
+# Konfigurasi untuk Aeris Air Quality System
+
+# Data paths
+data:
+  raw_path: "data/raw/surabaya_airquality_raw.csv"
+  processed_path: "data/processed/surabaya_processed.csv"
+  train_path: "data/processed/train.csv"
+  test_path: "data/processed/test.csv"
+  predictions_path: "data/processed/pipeline_test_predictions.csv"
+
+# Features
+features:
+  polutan:
+    - "pm25"
+    - "pm10"
+    - "co"
+    - "no2"
+    - "o3"
+  segmen:
+    - "PAGI"
+    - "SIANG"
+    - "SORE_MALAM"
+  lag_windows:
+    - 1
+    - 3
+    - 24
+  rolling_windows:
+    mean_3h: 3
+    mean_24h: 24
+    std_24h: 24
+    max_24h: 24
+  meteo_features:
+    - "temperature_2m"
+    - "relative_humidity"
+    - "wind_speed_10m"
+    - "wind_direction_10m"
+    - "precipitation"
+  time_features:
+    - "hour"
+    - "day_of_week"
+    - "month"
+    - "is_weekend"
+
+# Model training
+model:
+  cv_fold: 5
+  fold_strategy: "timeseries"
+  fold_shuffle: false
+  data_split_shuffle: false
+  session_id: 42
+  sort_metric: "MAE"
+  optimize_metric: "MAE"
+  n_select: 3
+  n_iter_tune: 50
+  co_log_transform: true
+
+# API
+api:
+  host: "0.0.0.0"
+  port: 8000
+  reload: true
+
+# Logging
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/app.log"
+
+# Monitoring
+monitoring:
+  isolation_forest:
+    contamination: 0.05
+    n_estimators: 100
+    random_state: 42
+
+# City coordinates
+city:
+  name: "Surabaya"
+  latitude: -7.2575
+  longitude: 112.7521
+  timezone: "Asia/Jakarta"

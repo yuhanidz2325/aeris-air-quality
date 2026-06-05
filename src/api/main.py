@@ -1,5 +1,6 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
+from apscheduler.triggers.interval import IntervalTrigger
 import subprocess
 import logging
 import threading
@@ -10,9 +11,11 @@ from datetime import datetime, time
 from typing import List, Optional, Dict
 import pytz
 import joblib
+import os
 
 from src.data.db_utils import execute_query
 from src.models.anomaly import predict_anomaly, POLLUTANTS
+from src.data.ingestion_service import fetch_realtime_data
 
 app = FastAPI(title="Aeris Air Quality API", version="1.0")
 
@@ -136,7 +139,10 @@ def run_retraining():
     except Exception as e:
         logger.error(f"Error saat retraining: {e}")
 
+# ── SCHEDULER SETUP ─────────────────────────────────────────
 scheduler = BackgroundScheduler()
+
+# 1. Retraining mingguan (tiap Minggu jam 1 pagi)
 scheduler.add_job(
     run_retraining,
     trigger=CronTrigger(day_of_week="sun", hour=1, minute=0),
@@ -145,14 +151,26 @@ scheduler.add_job(
     replace_existing=True
 )
 
+# 2. Fetch data real-time (tiap 1 jam) - TAMBAHAN!
+scheduler.add_job(
+    fetch_realtime_data,
+    trigger=IntervalTrigger(hours=1),
+    id="hourly_fetch",
+    name="Fetch data real-time tiap jam",
+    replace_existing=True
+)
+
 @app.on_event("startup")
 async def startup_event():
     scheduler.start()
-    logger.info("APScheduler started")
+    logger.info("✅ APScheduler started!")
+    logger.info("   - Retraining: setiap Minggu jam 01:00")
+    logger.info("   - Fetch data: setiap 1 jam")
 
 @app.on_event("shutdown")
 async def shutdown_event():
     scheduler.shutdown()
+    logger.info("APScheduler shutdown")
 
 class RetrainResponse(BaseModel):
     status: str
@@ -173,14 +191,22 @@ async def manual_retrain():
 @app.get("/retrain/status")
 async def retrain_status():
     job = scheduler.get_job("weekly_retrain")
+    fetch_job = scheduler.get_job("hourly_fetch")
     tz = pytz.timezone('Asia/Jakarta')
     if job and job.next_run_time:
-        next_run = job.next_run_time.astimezone(tz).strftime("%Y-%m-%d %H:%M %Z")
+        next_retrain = job.next_run_time.astimezone(tz).strftime("%Y-%m-%d %H:%M %Z")
     else:
-        next_run = "Tidak terjadwal"
+        next_retrain = "Tidak terjadwal"
+    
+    if fetch_job and fetch_job.next_run_time:
+        next_fetch = fetch_job.next_run_time.astimezone(tz).strftime("%Y-%m-%d %H:%M %Z")
+    else:
+        next_fetch = "Tidak terjadwal"
+    
     return {
         "scheduler_running": scheduler.running,
-        "next_retrain": next_run,
+        "next_retrain": next_retrain,
+        "next_fetch": next_fetch,
         "timestamp": datetime.now(tz)
     }
 
@@ -272,8 +298,16 @@ async def get_predictions():
     for param in POLLUTANTS:
         model_filename = f"models/{param}_{segment.lower()}_best.pkl"
         try:
-            predictions[param] = [40.1, 42.5, 45.0]  # Mock sementara
-        except FileNotFoundError:
+            if os.path.exists(model_filename):
+                model = joblib.load(model_filename)
+                # TODO: sesuaikan dengan input features yang dibutuhkan model
+                # Sementara pake mock data
+                predictions[param] = [40.1, 42.5, 45.0]
+            else:
+                logger.warning(f"Model tidak ditemukan: {model_filename}")
+                predictions[param] = []
+        except Exception as e:
+            logger.error(f"Gagal load model {param}: {e}")
             predictions[param] = []
 
     save_prediction_to_db(segment, predictions)

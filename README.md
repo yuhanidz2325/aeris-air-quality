@@ -5,6 +5,9 @@
 [![PyCaret](https://img.shields.io/badge/PyCaret-3.0+-orange.svg)](https://pycaret.org/)
 [![Docker](https://img.shields.io/badge/Docker-20.10+-blue.svg)](https://www.docker.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-lightblue.svg)](https://www.postgresql.org/)
+[![MAE](https://img.shields.io/badge/MAE-0.74-success.svg)](https://github.com/kelompok-aeris/capstone-air-quality)
+[![R2](https://img.shields.io/badge/R2-0.996-success.svg)](https://github.com/kelompok-aeris/capstone-air-quality)
+[![Tests](https://img.shields.io/badge/Tests-28%20passed-brightgreen.svg)](https://github.com/kelompok-aeris/capstone-air-quality)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 **Kelompok Aeris | D4 Sains Data Terapan PENS 2026 | Capstone Project**
@@ -21,12 +24,12 @@
 - [Fitur Unggulan](#-fitur-unggulan)
 - [Arsitektur Sistem](#-arsitektur-sistem)
 - [Metodologi Machine Learning](#-metodologi-machine-learning)
+- [Hasil Evaluasi Model](#-hasil-evaluasi-model)
 - [Teknologi yang Digunakan](#-teknologi-yang-digunakan)
 - [Cara Menjalankan Proyek](#-cara-menjalankan-proyek)
 - [Struktur Proyek](#-struktur-proyek)
 - [Skema Database](#-skema-database)
 - [API Documentation](#-api-documentation)
-- [Timeline Pengerjaan](#-timeline-pengerjaan)
 - [Lisensi](#-lisensi)
 
 ---
@@ -62,6 +65,7 @@ Kualitas udara di perkotaan seperti Surabaya sangat dinamis dan memiliki pola ya
 **Solusi Aeris:** 3 model terpisah per parameter polutan = 15 model total yang bekerja secara otomatis sesuai jam.
 
 ---
+
 ## 👥 Tim Pengembang
 
 | No | Peran | Nama | NRP | Tanggung Jawab |
@@ -69,6 +73,7 @@ Kualitas udara di perkotaan seperti Surabaya sangat dinamis dan memiliki pola ya
 | 1 | **Data & ML Engineer** | Linda Anggara Wati | 3324600008 | EDA, Feature Engineering, PyCaret (15 model), Isolation Forest |
 | 2 | **Backend & DevOps Engineer** | Yuhanidz Habibah | 3324600020 | Database, Backend API, Deployment, Retraining System |
 | 3 | **UI/UX Designer & Frontend Developer** | Intan Azzuhra Permadani | 3324600028 | UI/UX Design, Frontend Dashboard, Visualisasi Data |
+
 ---
 
 ## ✨ Fitur Unggulan
@@ -86,7 +91,7 @@ Kualitas udara di perkotaan seperti Surabaya sangat dinamis dan memiliki pola ya
 - 📈 **MLflow Integration**: Tracking semua eksperimen dan performa model
 - 🐳 **Dockerized Deployment**: Siap deploy di server manapun dengan satu perintah
 - 🔄 **Retraining Otomatis**: Model diperbarui setiap minggu dengan data terbaru
-- 📡 **REST API Lengkap**: 6+ endpoint untuk integrasi dengan sistem lain
+- 📡 **REST API Lengkap**: 7+ endpoint untuk integrasi dengan sistem lain
 
 ---
 
@@ -101,7 +106,7 @@ Kualitas udara di perkotaan seperti Surabaya sangat dinamis dan memiliki pola ya
                                       ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                         BACKEND API (FastAPI)                                │
-│            /status │ /history │ /predict │ /ispu │ /anomaly │ /retrain       │
+│            /status │ /history │ /predict │ /anomaly │ /retrain               │
 └─────────────────────────────────────────────────────────────────────────────┘
                                       │
               ┌───────────────────────┼───────────────────────┐
@@ -113,18 +118,8 @@ Kualitas udara di perkotaan seperti Surabaya sangat dinamis dan memiliki pola ya
 │   • air_quality_raw      │ │   • Isolation Forest     │ │     setiap jam           │
 │   • predictions          │ │   • MLflow               │ │   • Retrain model        │
 │   • anomaly_results      │ │   • Model versioning     │ │     setiap minggu        │
-│   • model_versions       │ │                          │ │                          │
 └──────────────────────────┘ └──────────────────────────┘ └──────────────────────────┘
 ```
-
-### Alur Data Lengkap:
-1. **Fetch** → Open-Meteo API (setiap jam via APScheduler)
-2. **Preprocess** → Feature engineering (21 fitur dari data mentah)
-3. **Segment** → Tentukan PAGI/SIANG/SORE_MALAM berdasarkan jam
-4. **Predict** → Load model sesuai segmen → Prediksi 3 jam ke depan
-5. **Detect** → Isolation Forest → Status anomali per parameter
-6. **Store** → Simpan ke PostgreSQL (predictions & anomaly_results)
-7. **Display** → Dashboard real-time (auto-refresh setiap 5 menit)
 
 ---
 
@@ -138,14 +133,10 @@ Mengacu pada **Peraturan Menteri LHK No. 14 Tahun 2020** (BUKAN standar BMKG ata
 | 0 - 50 | Baik | 🟢 Hijau | Tidak ada risiko kesehatan |
 | 51 - 100 | Sedang | 🔵 Biru | Kelompok sensitif mulai terdampak |
 | 101 - 200 | Tidak Sehat | 🟡 Kuning | Setiap orang mulai mengalami efek kesehatan |
-| 201 - 300 | Sangat Tidak Sehat | 🔴 Merah | Peringatan darurat kesehatan, semua terdampak serius |
-| > 300 | Berbahaya | ⚫ Hitam | Kondisi darurat, seluruh penduduk terdampak berat |
-
-**Perhitungan ISPU:** Dihitung untuk setiap parameter polutan secara terpisah (PM2.5, PM10, CO, NO2, O3), kemudian nilai tertinggi diambil sebagai ISPU final kondisi udara saat itu.
+| 201 - 300 | Sangat Tidak Sehat | 🔴 Merah | Peringatan darurat kesehatan |
+| > 300 | Berbahaya | ⚫ Hitam | Kondisi darurat, seluruh penduduk terdampak |
 
 ### 2. Segmentasi Waktu
-Kami membagi hari menjadi 3 segmen dengan karakteristik polusi berbeda:
-
 ```python
 def get_time_segment(hour):
     if 6 <= hour < 12:
@@ -156,38 +147,37 @@ def get_time_segment(hour):
         return "SORE_MALAM"  # rush hour sore + inversi malam
 ```
 
-### 3. Feature Engineering
-Dari data mentah (5 polutan + 5 meteorologi), kami menghasilkan **21 fitur**:
-
-| Kategori | Nama Fitur | Tujuan |
-|:---|:---|:---|
-| **Waktu** | `hour`, `day_of_week`, `month`, `is_weekend`, `time_segment` | Menangkap pola siklus harian, mingguan, dan musiman |
-| **Lag** | `pm25_lag_1h`, `pm25_lag_3h`, `pm25_lag_24h` (untuk 5 polutan) | Autokorelasi temporal |
-| **Rolling** | `rolling_mean_3h`, `rolling_mean_24h`, `rolling_std_24h`, `rolling_max_24h` | Smoothing & volatilitas |
-| **Perubahan** | `diff_1h`, `pct_change_1h` (untuk 5 polutan) | Deteksi lonjakan tiba-tiba |
-| **Meteorologi** | `temperature`, `humidity`, `wind_speed`, `wind_direction`, `precipitation` | Faktor eksternal |
-| **ISPU** | `ispu_pm25`, `ispu_category` | Standar baku mutu resmi |
-
-### 4. PyCaret AutoML
-**15 model** dilatih dan dibandingkan (5 parameter polutan x 3 segmen waktu):
+### 3. Hasil 15 Model PyCaret
 
 | Parameter | PAGI (06:00-11:59) | SIANG (12:00-17:59) | SORE/MALAM (18:00-05:59) |
 |:---|:---|:---|:---|
-| **PM2.5** | 🔄 [Hasil Minggu 3] | 🔄 [Hasil Minggu 3] | 🔄 [Hasil Minggu 3] |
-| **PM10** | 🔄 [Hasil Minggu 3] | 🔄 [Hasil Minggu 3] | 🔄 [Hasil Minggu 3] |
-| **CO** | 🔄 [Hasil Minggu 3] | 🔄 [Hasil Minggu 3] | 🔄 [Hasil Minggu 3] |
-| **NO2** | 🔄 [Hasil Minggu 3] | 🔄 [Hasil Minggu 3] | 🔄 [Hasil Minggu 3] |
-| **O3** | 🔄 [Hasil Minggu 3] | 🔄 [Hasil Minggu 3] | 🔄 [Hasil Minggu 3] |
+| **PM2.5** | BayesianRidge (R2=0.998) | BayesianRidge (R2=0.997) | Ridge (R2=0.999) |
+| **PM10** | BayesianRidge (R2=0.998) | BayesianRidge (R2=0.998) | BayesianRidge (R2=0.999) |
+| **CO** | CatBoost (R2=0.860) | CatBoost (R2=0.844) | CatBoost (R2=0.863) |
+| **NO2** | CatBoost (R2=0.918) | CatBoost (R2=0.858) | CatBoost (R2=0.930) |
+| **O3** | CatBoost (R2=0.905) | CatBoost (R2=0.867) | CatBoost (R2=0.867) |
 
-**Algoritma yang dibandingkan:** Random Forest, XGBoost, LightGBM, CatBoost, Extra Trees, Ridge Regression, KNN, Decision Tree, dll.
-
-### 5. Isolation Forest (Anomaly Detection)
-**Bekerja paralel dengan model prediksi - saling melengkapi:**
+### 4. Isolation Forest (Anomaly Detection)
 
 | Komponen | Tugas | Output |
 |:---|:---|:---|
 | **PyCaret (Regresi)** | "Berapa nilai PM2.5 3 jam lagi?" | Prediksi nilai numerik |
 | **Isolation Forest** | "Apakah nilai PM2.5 saat ini anomali?" | Status Anomali / Normal + Skor |
+
+---
+
+## 📊 Hasil Evaluasi Model
+
+**Model terbaik: PM2.5 - PAGI (BayesianRidge)**
+
+| Metrik | Nilai | Evaluasi |
+|:---|:---|:---|
+| **MAE** | 0.7441 | ✅ Sangat baik (error < 1 µg/m³) |
+| **R²** | 0.9959 | ✅ 99.6% variansi terjelaskan |
+| **Overfitting Gap** | -0.0954 | ✅ Tidak overfitting |
+| **Mean Residual** | -0.2349 | ✅ Mendekati 0 |
+
+**Kesimpulan:** Model sangat akurat dan siap digunakan untuk prediksi real-time.
 
 ---
 
@@ -237,17 +227,10 @@ cp .env.example .env
 docker-compose up --build
 
 # 4. Akses aplikasi
-# Frontend    : http://localhost
+# Frontend    : http://localhost:8888
 # API Docs    : http://localhost:8000/docs
 # Database    : localhost:5432
 ```
-
-**Service yang berjalan:**
-| Service | Port | Fungsi |
-|:---|:---|:---|
-| Database | 5432 | PostgreSQL |
-| Backend | 8000 | FastAPI + ML |
-| Frontend | 80 | Nginx dashboard |
 
 ### Menjalankan Manual (Development)
 
@@ -264,14 +247,11 @@ pip install -r requirements.txt
 # 3. Setup database
 psql -U postgres -d aeris_db -f database/schema.sql
 
-# 4. Fetch data historis
-python src/data/fetch_data.py
-
-# 5. Jalankan backend
+# 4. Jalankan backend
 uvicorn src.api.main:app --reload --port 8000
 
-# 6. Sajikan frontend (terminal terpisah)
-cd frontend && python -m http.server 80
+# 5. Sajikan frontend (terminal terpisah)
+cd frontend && python -m http.server 8888
 ```
 
 ---
@@ -279,21 +259,21 @@ cd frontend && python -m http.server 80
 ## 📁 Struktur Proyek
 
 ```
-capstone-air-quality/
+aeris-air-quality/
 │
-├── data/                           # Data storage
-│   ├── raw/                        # Data mentah (CSV)
-│   └── processed/                  # Data setelah feature engineering
+├── config/                        # Konfigurasi
+│   └── config.yaml                # Parameter terpusat
 │
-├── database/
-│   └── schema.sql                  # DDL CREATE TABLE
+├── data/                          # Data storage
+│   ├── raw/                       # Data mentah (CSV)
+│   └── processed/                 # Data setelah feature engineering
 │
 ├── frontend/
-│   ├── index.html                  # Dashboard utama
-│   ├── style.css                   # Styling
-│   └── script.js                   # Logic + API calls
+│   ├── index.html                 # Dashboard utama
+│   ├── style.css                  # Styling
+│   └── script.js                  # Logic + API calls
 │
-├── models/                         # Saved models (15+ files)
+├── models/                        # Saved models (15+ files)
 │   ├── pm25_pagi_best.pkl
 │   ├── isolation_forest.pkl
 │   └── ...
@@ -302,32 +282,35 @@ capstone-air-quality/
 │   ├── 01_data_collection.ipynb
 │   ├── 02_preprocessing.ipynb
 │   ├── 03_pycaret_comparison.ipynb
-│   └── 04_pipeline_testing.ipynb
+│   ├── 04_pipeline_testing.ipynb
+│   └── 05_finalisasi.ipynb
 │
 ├── reports/
-│   ├── Laporan_Akhir.docx
-│   └── Slide_Presentasi.pptx
+│   └── slide_viz/                 # Visualisasi slide
 │
 ├── src/
-│   ├── api/                        # FastAPI
-│   │   ├── main.py
-│   │   ├── endpoints/
-│   │   ├── schemas.py
-│   │   └── db_utils.py
-│   ├── data/                       # Data pipeline
+│   ├── api/                       # FastAPI
+│   │   └── main.py
+│   ├── data/                      # Data pipeline
 │   │   ├── fetch_data.py
 │   │   ├── ingestion_service.py
-│   │   └── preprocess.py
-│   └── models/                     # ML logic
-│       ├── train_model.py
-│       ├── predict_model.py
-│       └── anomaly.py
+│   │   └── db_utils.py
+│   ├── models/                    # ML logic
+│   │   ├── train_model.py
+│   │   ├── predict_model.py
+│   │   └── anomaly.py
+│   └── utils/                     # Utilities
+│       ├── logger.py
+│       └── config_loader.py
 │
-├── .env.example
+├── tests/                         # Unit testing (28 tests)
+│   ├── test_preprocessing.py
+│   ├── test_features.py
+│   ├── test_model.py
+│   └── test_pipeline.py
+│
 ├── docker-compose.yml
-├── Dockerfile.backend
-├── Dockerfile.frontend
-├── Makefile
+├── Dockerfile
 ├── requirements.txt
 └── README.md
 ```
@@ -378,17 +361,6 @@ CREATE TABLE anomaly_results (
     is_anomaly BOOLEAN NOT NULL
 );
 
--- 5. Tabel model_versions
-CREATE TABLE model_versions (
-    id SERIAL PRIMARY KEY,
-    parameter VARCHAR(10) NOT NULL,
-    time_segment VARCHAR(20) NOT NULL,
-    model_type VARCHAR(50) NOT NULL,
-    mae DECIMAL, rmse DECIMAL, r2 DECIMAL,
-    model_path VARCHAR(255) NOT NULL,
-    trained_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
 -- Insert Surabaya
 INSERT INTO cities (name, latitude, longitude) 
 VALUES ('Surabaya', -7.2575, 112.7521);
@@ -402,11 +374,12 @@ VALUES ('Surabaya', -7.2575, 112.7521);
 
 | Method | Endpoint | Deskripsi |
 |:---|:---|:---|
-| `GET` | `/status/surabaya` | Data terkini + ISPU + warna |
+| `GET` | `/` | Root welcome message |
+| `GET` | `/status/surabaya` | Data terkini + ISPU + warna + anomali |
 | `GET` | `/history/surabaya` | Data historis (filter date & parameter) |
 | `GET` | `/predict/surabaya` | Prediksi 3 jam ke depan |
-| `GET` | `/ispu/surabaya` | Nilai ISPU per parameter |
 | `GET` | `/anomaly/surabaya` | Status anomali per parameter |
+| `GET` | `/retrain/status` | Status scheduler & next run |
 | `POST` | `/retrain` | Manual trigger retraining |
 
 > 📖 **Interactive API Docs:** `http://localhost:8000/docs`

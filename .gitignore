@@ -1,21 +1,57 @@
+# Dependencies
 node_modules
 dist
+
+# Environment variables
 .env
-# Lingkungan Virtual & Python
+docker-compose.env
+
+# Virtual Environment
 venv/
+env/
 __pycache__/
 *.pyc
 
-# MLFlow
+# MLflow tracking
 mlruns/
 
-# Log & Konfigurasi
+# Log files
+logs.log
+*.log
 reports/ingestion.log
-docker-compose.env
-.env
 
-# Folder Frontend
+# Frontend
 frontend/node_modules/
 frontend/dist/
 frontend/.DS_Store
+
+# Saved models
 /models
+*.pkl
+*.joblib
+
+# Data files (jangan commit CSV, tapi tetap track .gitignore)
+data/raw/*.csv
+data/processed/*.csv
+!data/raw/.gitignore
+!data/processed/.gitignore
+
+# DVC cache
+.dvc/cache/
+.dvc/tmp/
+.dvc/config.local
+
+# CatBoost
+catboost_info/
+
+# Jupyter notebooks
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db

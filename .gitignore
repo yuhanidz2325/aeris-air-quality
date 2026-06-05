@@ -25,16 +25,15 @@ frontend/node_modules/
 frontend/dist/
 frontend/.DS_Store
 
-# Saved models (JANGAN ignore folder models, tapi ignore file sementara)
-# models/   <-- BARIS INI DIHAPUS ATAU DIKOMEN!
+# Temporary model files (tapi tetap track .pkl asli)
+*.tmp
+*.bak
 *.pkl.tmp
 *.joblib.tmp
 
-# Data files (jangan commit CSV, tapi tetap track .gitignore)
-data/raw/*.csv
-data/processed/*.csv
-!data/raw/.gitignore
-!data/processed/.gitignore
+# Data files (KOMENTAR atau HAPUS baris ini biar CSV ke-track)
+# data/raw/*.csv
+# data/processed/*.csv
 
 # DVC cache (kalau masih ada)
 .dvc/cache/
@@ -55,7 +54,3 @@ catboost_info/
 # OS
 .DS_Store
 Thumbs.db
-
-# Backup files
-*.bak
-*.backup

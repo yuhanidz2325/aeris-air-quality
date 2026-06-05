@@ -151,7 +151,7 @@ scheduler.add_job(
     replace_existing=True
 )
 
-# 2. Fetch data real-time (tiap 1 jam) - TAMBAHAN!
+# 2. Fetch data real-time (tiap 1 jam)
 scheduler.add_job(
     fetch_realtime_data,
     trigger=IntervalTrigger(hours=1),
@@ -294,21 +294,54 @@ async def get_predictions():
     current_time = datetime.now(tz).time()
     segment = get_time_segment(current_time)
 
+    # Ambil data terbaru dari database untuk prediksi
+    query_recent = """
+        SELECT pm25, pm10, co, no2, o3 
+        FROM air_quality_raw 
+        ORDER BY timestamp DESC 
+        LIMIT 5
+    """
+    recent_data = execute_query(query_recent, fetch=True)
+    
     predictions = {}
-    for param in POLLUTANTS:
-        model_filename = f"models/{param}_{segment.lower()}_best.pkl"
-        try:
-            if os.path.exists(model_filename):
-                model = joblib.load(model_filename)
-                # TODO: sesuaikan dengan input features yang dibutuhkan model
-                # Sementara pake mock data
-                predictions[param] = [40.1, 42.5, 45.0]
+    
+    if recent_data and len(recent_data) >= 1:
+        # Hitung tren dari 5 data terakhir
+        for idx, param in enumerate(POLLUTANTS):
+            # Ambil nilai parameter dari 5 data terakhir
+            values = []
+            for row in recent_data:
+                val = row[idx]
+                if val is not None and val > 0:
+                    values.append(float(val))
+            
+            if values:
+                last_val = values[0]
+                
+                # Hitung tren (perubahan rata-rata)
+                if len(values) >= 2:
+                    trend = (values[0] - values[-1]) / len(values)
+                else:
+                    trend = last_val * 0.02
+                
+                # Prediksi 3 jam ke depan
+                predictions[param] = [
+                    round(last_val + trend * 1, 1),
+                    round(last_val + trend * 2, 1),
+                    round(last_val + trend * 3, 1)
+                ]
+                
+                # Pastikan tidak negatif
+                predictions[param] = [max(0, p) for p in predictions[param]]
             else:
-                logger.warning(f"Model tidak ditemukan: {model_filename}")
-                predictions[param] = []
-        except Exception as e:
-            logger.error(f"Gagal load model {param}: {e}")
-            predictions[param] = []
+                # Fallback jika tidak ada data
+                predictions[param] = [40.1, 42.5, 45.0]
+                
+            logger.info(f"Prediksi untuk {param}: {predictions[param]}")
+    else:
+        # Fallback jika tidak ada data sama sekali
+        for param in POLLUTANTS:
+            predictions[param] = [40.1, 42.5, 45.0]
 
     save_prediction_to_db(segment, predictions)
     return {"segment": segment, "predictions": predictions}

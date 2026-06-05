@@ -17,6 +17,9 @@ warnings.filterwarnings("ignore")
 
 from pycaret.regression import setup, compare_models, pull, tune_model, save_model
 
+# Allow MLflow file store (untuk menghindari error)
+os.environ["MLFLOW_ALLOW_FILE_STORE"] = "true"
+
 # ── Konstanta ────────────────────────────────────────────────────
 POLUTAN = ["pm25", "pm10", "co", "no2", "o3"]
 SEGMEN  = ["PAGI", "SIANG", "SORE_MALAM"]
@@ -60,10 +63,20 @@ def train_single(df, polutan, segmen):
 
     print(f"  Data: {df_model.shape[0]:,} baris x {len(feat_avail)} fitur")
 
-    # PyCaret
-    exp = setup(data=df_model, target=polutan, fold=5,
-                session_id=42, verbose=False, html=False,
-                log_experiment=False)
+    # PyCaret Setup dengan TIME SERIES VALIDATION
+    exp = setup(
+        data=df_model, 
+        target=polutan, 
+        fold=5,
+        fold_strategy='timeseries',
+        fold_shuffle=False,
+        data_split_shuffle=False,
+        session_id=42, 
+        verbose=False, 
+        html=False,
+        log_experiment=False
+    )
+    
     top3       = compare_models(n_select=3, sort="MAE", verbose=False)
     best_model = top3[0] if isinstance(top3, list) else top3
     best_name  = type(best_model).__name__
@@ -105,7 +118,7 @@ def train_all(data_path="data/processed/surabaya_processed.csv"):
     print("=" * 55)
 
     df = pd.read_csv(data_path, parse_dates=["time"])
-    mlflow.set_tracking_uri("mlruns")
+    mlflow.set_tracking_uri("sqlite:///mlflow.db")
     mlflow.set_experiment("aeris-air-quality-retrain")
 
     rekap = []
@@ -134,7 +147,7 @@ if __name__ == "__main__":
 
     df = pd.read_csv("data/processed/surabaya_processed.csv",
                      parse_dates=["time"])
-    mlflow.set_tracking_uri("mlruns")
+    mlflow.set_tracking_uri("sqlite:///mlflow.db")
     mlflow.set_experiment("aeris-air-quality-retrain")
 
     if args.polutan and args.segmen:

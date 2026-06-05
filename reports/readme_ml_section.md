@@ -23,11 +23,11 @@ setup() -> compare_models() -> tune_model() -> save_model()
 
 | Parameter | PAGI | SIANG | SORE/MALAM |
 |:---:|:---:|:---:|:---:|
-| PM25 | BayesianRidge (R2=0.998) | BayesianRidge (R2=0.997) | Ridge (R2=0.999) |
-| PM10 | BayesianRidge (R2=0.998) | BayesianRidge (R2=0.998) | BayesianRidge (R2=0.999) |
-| CO | CatBoost (R2=0.860) | CatBoost (R2=0.844) | CatBoost (R2=0.863) |
-| NO2 | CatBoost (R2=0.918) | CatBoost (R2=0.858) | CatBoost (R2=0.930) |
-| O3 | CatBoost (R2=0.905) | CatBoost (R2=0.867) | CatBoost (R2=0.867) |
+| PM25 | Lasso (R2=0.995) | BayesianRidge (R2=0.987) | Lasso (R2=0.997) |
+| PM10 | Lasso (R2=0.993) | BayesianRidge (R2=0.987) | Lasso (R2=0.997) |
+| CO | ExtraTrees (R2=0.718) | GradientBoostingRegressor (R2=0.711) | LightGBM (R2=0.792) |
+| NO2 | LightGBM (R2=0.759) | LightGBM (R2=0.762) | ElasticNet (R2=0.782) |
+| O3 | ExtraTrees (R2=0.815) | BayesianRidge (R2=0.758) | GradientBoostingRegressor (R2=0.551) |
 
 
 ### Metrik Evaluasi

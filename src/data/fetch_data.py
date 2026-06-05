@@ -15,21 +15,27 @@ def insert_csv_to_db(file_path):
     df = pd.read_csv(file_path)
     df["city_id"] = 1
 
-    # Kolom yang ada di tabel DB
+    # Kolom yang ada di tabel DB (HANYA YANG ADA DI DATABASE)
     kolom_db = [
-        "city_id", "time", "pm25", "pm10", "co", "no2", "o3",
-        "temperature_2m", "relative_humidity",
-        "wind_speed_10m", "wind_direction_10m", "precipitation"
+        "city_id", "pm25", "pm10", "co", "no2", "o3", "timestamp"
     ]
+    
+    # Rename kolom 'time' ke 'timestamp' jika ada
+    if 'time' in df.columns:
+        df.rename(columns={"time": "timestamp"}, inplace=True)
+    
+    # Ambil kolom yang tersedia
     kolom_ada = [c for c in kolom_db if c in df.columns]
-    data      = df[kolom_ada].copy()
-    data.rename(columns={"time": "timestamp"}, inplace=True)
+    data = df[kolom_ada].copy()
+    
+    # Hapus baris dengan timestamp null
+    data = data.dropna(subset=['timestamp'])
 
-    conn = get_db_connection()  # pakai db_utils, tidak duplikasi
+    conn = get_db_connection()
     if conn:
-        cursor    = conn.cursor()
+        cursor = conn.cursor()
         kolom_str = ", ".join(data.columns)
-        query     = f"""
+        query = f"""
             INSERT INTO air_quality_raw ({kolom_str})
             VALUES %s
             ON CONFLICT (city_id, timestamp) DO NOTHING

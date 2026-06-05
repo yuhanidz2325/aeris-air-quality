@@ -140,14 +140,15 @@ function Prediksi() {
   if (loading) return (
     <div className="tab-content" style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
       <section style={{
-        background: 'linear-gradient(145deg, #0B1F3A 0%, #0D3B6E 55%, #1058A8 100%)',
+        background: 'linear-gradient(135deg, #EDE9FE 0%, #DBEAFE 50%, #E0E7FF 100%)',
         borderRadius: 24, padding: '36px', marginBottom: 28,
-        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-        minHeight: 200,
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        justifyContent: 'center', minHeight: 200,
+        border: '1.5px solid #E2E8F0',
       }}>
-        <i className="ti ti-crystal-ball" style={{ fontSize: 48, color: '#475569', marginBottom: 16 }} aria-hidden />
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#94A3B8' }}>
-          <span style={{ width: 18, height: 18, border: '2.5px solid #475569', borderTop: '2.5px solid #60A5FA', borderRadius: '50%', animation: 'spin 1s linear infinite', display: 'inline-block' }} />
+        <i className="ti ti-crystal-ball" style={{ fontSize: 48, color: '#7C3AED', marginBottom: 16 }} aria-hidden />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#6D28D9' }}>
+          <span style={{ width: 18, height: 18, border: '2.5px solid #C4B5FD', borderTop: '2.5px solid #7C3AED', borderRadius: '50%', animation: 'spin 1s linear infinite', display: 'inline-block' }} />
           <span style={{ fontSize: 15, fontWeight: 600 }}>Memuat prediksi...</span>
         </div>
       </section>
@@ -157,14 +158,14 @@ function Prediksi() {
   if (error) return (
     <div className="tab-content" style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
       <section style={{
-        background: 'linear-gradient(145deg, #3B0000 0%, #7F1D1D 55%, #DC2626 100%)',
+        background: '#FEE2E2', border: '1.5px solid #FECACA',
         borderRadius: 24, padding: '36px', marginBottom: 28,
-        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-        minHeight: 200,
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        justifyContent: 'center', minHeight: 200,
       }}>
-        <i className="ti ti-alert-circle" style={{ fontSize: 48, color: '#FECACA', marginBottom: 16 }} aria-hidden />
-        <div style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginBottom: 8 }}>Gagal Memuat Prediksi</div>
-        <div style={{ fontSize: 13, color: '#FCA5A5' }}>Silakan coba lagi nanti.</div>
+        <i className="ti ti-alert-circle" style={{ fontSize: 48, color: '#DC2626', marginBottom: 16 }} aria-hidden />
+        <div style={{ fontSize: 18, fontWeight: 700, color: '#7F1D1D', marginBottom: 8 }}>Gagal Memuat Prediksi</div>
+        <div style={{ fontSize: 13, color: '#DC2626' }}>Silakan coba lagi nanti.</div>
       </section>
     </div>
   );
@@ -172,19 +173,21 @@ function Prediksi() {
   return (
     <div className="tab-content" style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
 
-      {/* ── HERO SECTION ── */}
+      {/* ── HERO SECTION — soft purple ── */}
       <section style={{
-        background: 'linear-gradient(145deg, #1E0B4B 0%, #3B1F8C 55%, #5B3ACA 100%)',
-        borderRadius: 24, padding: '36px', position: 'relative', overflow: 'hidden', marginBottom: 28,
+        background: 'linear-gradient(135deg, #EDE9FE 0%, #DBEAFE 50%, #E0E7FF 100%)',
+        borderRadius: 24, padding: '36px', position: 'relative',
+        overflow: 'hidden', marginBottom: 28,
+        border: '1.5px solid #E2E8F0',
       }}>
-        <div style={{ position: 'absolute', top: -50, right: -50, width: 220, height: 220, borderRadius: '50%', background: 'rgba(139,92,246,0.2)', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', bottom: -30, left: -30, width: 160, height: 160, borderRadius: '50%', background: 'rgba(99,102,241,0.15)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', top: -50, right: -50, width: 220, height: 220, borderRadius: '50%', background: 'rgba(139,92,246,0.12)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', bottom: -30, left: -30, width: 160, height: 160, borderRadius: '50%', background: 'rgba(99,102,241,0.10)', pointerEvents: 'none' }} />
 
         <div style={{ position: 'relative' }}>
           <span style={{
-            fontSize: 11, fontWeight: 700, color: '#C4B5FD',
-            background: 'rgba(139,92,246,0.2)', padding: '5px 16px',
-            borderRadius: 20, border: '1px solid rgba(139,92,246,0.4)',
+            fontSize: 11, fontWeight: 700, color: '#6D28D9',
+            background: 'rgba(139,92,246,0.12)', padding: '5px 16px',
+            borderRadius: 20, border: '1px solid rgba(139,92,246,0.25)',
             display: 'inline-flex', alignItems: 'center', gap: 6,
             letterSpacing: '0.06em', marginBottom: 16,
           }}>
@@ -192,38 +195,41 @@ function Prediksi() {
             PREDIKSI KUALITAS UDARA · 3 JAM KE DEPAN
           </span>
 
-          <div style={{ fontSize: 36, fontWeight: 800, color: '#fff', marginBottom: 10, letterSpacing: '-0.02em' }}>
+          <div style={{ fontSize: 36, fontWeight: 800, color: '#1E1B4B', marginBottom: 10, letterSpacing: '-0.02em' }}>
             Forecast Polutan Surabaya
           </div>
-          <div style={{ fontSize: 14, color: '#A78BFA', lineHeight: 1.7, marginBottom: 24, maxWidth: 520 }}>
+          <div style={{ fontSize: 14, color: '#4C1D95', lineHeight: 1.7, marginBottom: 24, maxWidth: 520, opacity: 0.85 }}>
             Prediksi konsentrasi polutan udara 3 jam ke depan menggunakan model machine learning Random Forest yang telah dilatih dengan data historis Surabaya.
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
             {[
-              { icon: 'ti-cpu',       label: 'Model Aktif',    value: 'Random Forest',        color: '#C4B5FD' },
-              { icon: 'ti-clock',     label: 'Segmen Waktu',   value: segment || '—',         color: '#34D399' },
-              { icon: 'ti-chart-bar', label: 'Akurasi (R²)',   value: '87%',                  color: '#60A5FA' },
-              { icon: 'ti-target',    label: 'Horizon',        value: '3 jam ke depan',       color: '#FCD34D' },
+              { icon: 'ti-cpu',       label: 'Model Aktif',  value: 'Random Forest',  color: '#6D28D9', bg: 'rgba(139,92,246,0.1)',  border: 'rgba(139,92,246,0.2)'  },
+              { icon: 'ti-clock',     label: 'Segmen Waktu', value: segment || '—',   color: '#1D4ED8', bg: 'rgba(37,99,235,0.1)',   border: 'rgba(37,99,235,0.2)'   },
+              { icon: 'ti-chart-bar', label: 'Akurasi (R²)', value: '87%',            color: '#065F46', bg: 'rgba(22,163,74,0.1)',   border: 'rgba(22,163,74,0.2)'   },
+              { icon: 'ti-target',    label: 'Horizon',      value: '3 jam ke depan', color: '#92400E', bg: 'rgba(217,119,6,0.1)',   border: 'rgba(217,119,6,0.2)'   },
             ].map(item => (
               <div key={item.label} style={{
-                background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.10)',
-                borderRadius: 12, padding: '12px 14px', borderLeft: `3px solid ${item.color}`,
+                background: item.bg, border: `1px solid ${item.border}`,
+                borderRadius: 12, padding: '12px 14px',
+                borderLeft: `3px solid ${item.color}`,
                 transition: 'background 0.2s, transform 0.2s', cursor: 'default',
               }}
-              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.12)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.07)'; e.currentTarget.style.transform = 'translateY(0)'; }}
+              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; }}
               >
                 <i className={`ti ${item.icon}`} style={{ fontSize: 16, color: item.color, display: 'block', marginBottom: 6 }} aria-hidden />
-                <div style={{ fontSize: 10, fontWeight: 700, color: '#7C6BBB', marginBottom: 3, letterSpacing: '0.06em' }}>{item.label.toUpperCase()}</div>
-                <div style={{ fontSize: 15, fontWeight: 800, color: '#fff' }}>{item.value}</div>
+                <div style={{ fontSize: 10, fontWeight: 700, color: item.color, marginBottom: 3, letterSpacing: '0.06em', opacity: 0.8 }}>
+                  {item.label.toUpperCase()}
+                </div>
+                <div style={{ fontSize: 15, fontWeight: 800, color: '#1E1B4B' }}>{item.value}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── PILIH POLUTAN ── */}
+      {/* ── PILIH PARAMETER ── */}
       <section style={{ marginBottom: 24 }}>
         <div style={{ fontSize: 20, fontWeight: 800, color: '#0F172A', marginBottom: 4 }}>Pilih Parameter</div>
         <div style={{ fontSize: 13, color: '#64748B', marginBottom: 16 }}>Pilih polutan untuk melihat detail prediksi dan grafik</div>
@@ -273,10 +279,10 @@ function Prediksi() {
                   borderTop: `4px solid ${isWarn ? '#DC2626' : s.color}`,
                   transition: 'transform 0.18s, box-shadow 0.18s',
                   cursor: 'pointer',
-                  boxShadow: isSelected ? '0 0 0 2px #7C3AED40' : 'none',
+                  boxShadow: isSelected ? '0 0 0 2px #C4B5FD' : 'none',
                 }}
                 onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = `0 8px 24px ${isWarn ? '#FECACA' : s.border}80`; }}
-                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = isSelected ? '0 0 0 2px #7C3AED40' : 'none'; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = isSelected ? '0 0 0 2px #C4B5FD' : 'none'; }}
               >
                 <div style={{ fontSize: 12, fontWeight: 700, color: isWarn ? '#7F1D1D' : s.textColor, marginBottom: 8 }}>{cfg.label}</div>
                 <div style={{ fontSize: 36, fontWeight: 800, color: isWarn ? '#DC2626' : s.textColor, lineHeight: 1, marginBottom: 6 }}>
@@ -315,37 +321,46 @@ function Prediksi() {
               Aktual
             </span>
             <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#475569', fontWeight: 500 }}>
-              <span style={{ width: 20, height: 2, background: '#7C3AED', borderRadius: 2, display: 'inline-block' }} />
+              <span style={{ width: 20, height: 2, background: '#F97316', borderRadius: 2, display: 'inline-block' }} />
               Prediksi
             </span>
           </div>
         </div>
+
         <div style={{ background: '#fff', borderRadius: 18, padding: '20px 22px', border: '1px solid #E2E8F0', boxShadow: '0 1px 4px rgba(15,23,42,0.05)' }}>
-          <div style={{ width: '100%', height: 300 }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData} margin={{ top: 8, right: 16, left: -16, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
-                <XAxis dataKey="time" stroke="#CBD5E1" tick={{ fill: '#94A3B8', fontSize: 11 }} />
-                <YAxis stroke="#CBD5E1" tick={{ fill: '#94A3B8', fontSize: 11 }} />
-                <Tooltip content={<CustomTooltip />} />
-                <ReferenceLine
-                  y={POLUTAN_CONFIG[selectedPolutan].batas}
-                  stroke="#DC2626" strokeDasharray="5 5" strokeWidth={1.5}
-                  label={{ value: 'Batas', fill: '#DC2626', fontSize: 10, fontWeight: 700, position: 'insideTopRight' }}
-                />
-                <Line type="monotone" dataKey="actual"
-                  stroke={POLUTAN_STYLE[selectedPolutan].color} strokeWidth={2.5}
-                  dot={{ r: 4, stroke: '#fff', strokeWidth: 2, fill: POLUTAN_STYLE[selectedPolutan].color }}
-                  activeDot={{ r: 7, stroke: '#fff', strokeWidth: 2 }}
-                  name="Aktual" connectNulls={false} />
-                <Line type="monotone" dataKey="predicted"
-                  stroke="#7C3AED" strokeDasharray="6 4" strokeWidth={2.5}
-                  dot={{ r: 4, stroke: '#fff', strokeWidth: 2, fill: '#7C3AED' }}
-                  activeDot={{ r: 7, stroke: '#fff', strokeWidth: 2 }}
-                  name="Prediksi" connectNulls={false} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+          {loading ? <ChartLoading /> : (
+            <div style={{ width: '100%', height: 300 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={chartData} margin={{ top: 8, right: 16, left: -16, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+                  <XAxis dataKey="time" stroke="#CBD5E1" tick={{ fill: '#94A3B8', fontSize: 11 }} />
+                  <YAxis stroke="#CBD5E1" tick={{ fill: '#94A3B8', fontSize: 11 }} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <ReferenceLine
+                    y={POLUTAN_CONFIG[selectedPolutan].batas}
+                    stroke="#DC2626" strokeDasharray="5 5" strokeWidth={1.5}
+                    label={{ value: 'Batas', fill: '#DC2626', fontSize: 10, fontWeight: 700, position: 'insideTopRight' }}
+                  />
+                  <Line
+                    type="monotone" dataKey="actual"
+                    stroke={POLUTAN_STYLE[selectedPolutan].color}
+                    strokeWidth={2.5}
+                    dot={{ r: 4, stroke: '#fff', strokeWidth: 2, fill: POLUTAN_STYLE[selectedPolutan].color }}
+                    activeDot={{ r: 7, stroke: '#fff', strokeWidth: 2 }}
+                    name="Aktual" connectNulls={false}
+                  />
+                  <Line
+                    type="monotone" dataKey="predicted"
+                    stroke="#F97316"
+                    strokeDasharray="6 4" strokeWidth={2.5}
+                    dot={{ r: 4, stroke: '#fff', strokeWidth: 2, fill: '#F97316' }}
+                    activeDot={{ r: 7, stroke: '#fff', strokeWidth: 2 }}
+                    name="Prediksi" connectNulls={false}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          )}
         </div>
       </section>
 
@@ -353,17 +368,18 @@ function Prediksi() {
       <section style={{ marginBottom: 8 }}>
         <div style={{ fontSize: 20, fontWeight: 800, color: '#0F172A', marginBottom: 4 }}>Insight Prediksi</div>
         <div style={{ fontSize: 13, color: '#64748B', marginBottom: 16 }}>Analisis otomatis berdasarkan hasil prediksi model</div>
-        <div style={{ background: '#DBEAFE', border: '1.5px solid #93C5FD', borderRadius: 18, padding: 24 }}>
+
+        <div style={{ background: '#EDE9FE', border: '1.5px solid #C4B5FD', borderRadius: 18, padding: 24 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16 }}>
             <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(255,255,255,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <i className="ti ti-bulb" style={{ fontSize: 22, color: '#2563EB' }} aria-hidden />
+              <i className="ti ti-bulb" style={{ fontSize: 22, color: '#7C3AED' }} aria-hidden />
             </div>
             <div>
-              <div style={{ fontSize: 16, fontWeight: 800, color: '#0F172A' }}>Insight Prediksi 3 Jam ke Depan</div>
-              <div style={{ fontSize: 12, color: '#64748B', marginTop: 2 }}>Berdasarkan model {segment || 'aktif'}</div>
+              <div style={{ fontSize: 16, fontWeight: 800, color: '#1E1B4B' }}>Insight Prediksi 3 Jam ke Depan</div>
+              <div style={{ fontSize: 12, color: '#6D28D9', marginTop: 2 }}>Berdasarkan model {segment || 'aktif'}</div>
             </div>
           </div>
-          <div style={{ background: 'rgba(255,255,255,0.65)', borderRadius: 12, padding: '14px 18px', fontSize: 13, lineHeight: 1.8, color: '#475569', marginBottom: 16 }}>
+          <div style={{ background: 'rgba(255,255,255,0.65)', borderRadius: 12, padding: '14px 18px', fontSize: 13, lineHeight: 1.8, color: '#3B0764', marginBottom: 16 }}>
             {generateInsight()}
           </div>
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
@@ -374,8 +390,8 @@ function Prediksi() {
             ].map(tag => (
               <span key={tag.label} style={{
                 fontSize: 11, fontWeight: 600, padding: '4px 12px', borderRadius: 20,
-                background: 'rgba(255,255,255,0.7)', border: '1px solid rgba(0,0,0,0.06)',
-                color: '#475569', display: 'flex', alignItems: 'center', gap: 5,
+                background: 'rgba(255,255,255,0.7)', border: '1px solid rgba(124,58,237,0.2)',
+                color: '#6D28D9', display: 'flex', alignItems: 'center', gap: 5,
               }}>
                 <i className={`ti ${tag.icon}`} style={{ fontSize: 12 }} aria-hidden />
                 {tag.label}
@@ -385,33 +401,34 @@ function Prediksi() {
         </div>
       </section>
 
-      {/* ── FOOTER CTA ── */}
+      {/* ── FOOTER CTA — soft purple ── */}
       <section style={{
-        background: 'linear-gradient(145deg, #1E0B4B 0%, #3B1F8C 60%, #5B3ACA 100%)',
+        background: 'linear-gradient(135deg, #EDE9FE 0%, #DBEAFE 50%, #E0E7FF 100%)',
         borderRadius: 20, padding: '28px 32px', textAlign: 'center',
         position: 'relative', overflow: 'hidden', marginTop: 20,
+        border: '1.5px solid #E2E8F0',
       }}>
-        <div style={{ position: 'absolute', top: -30, right: -30, width: 160, height: 160, borderRadius: '50%', background: 'rgba(139,92,246,0.2)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', top: -30, right: -30, width: 160, height: 160, borderRadius: '50%', background: 'rgba(139,92,246,0.12)', pointerEvents: 'none' }} />
         <div style={{ position: 'relative' }}>
-          <div style={{ fontSize: 18, fontWeight: 800, color: '#fff', marginBottom: 8 }}>
+          <div style={{ fontSize: 18, fontWeight: 800, color: '#1E1B4B', marginBottom: 8 }}>
             Ingin melihat data lebih lengkap?
           </div>
-          <p style={{ fontSize: 13, color: '#A78BFA', lineHeight: 1.7, marginBottom: 16 }}>
+          <p style={{ fontSize: 13, color: '#4C1D95', lineHeight: 1.7, marginBottom: 16, opacity: 0.85 }}>
             Jelajahi tab Kondisi Data untuk melihat pipeline ML, perbandingan model, dan kualitas data secara mendalam.
           </p>
           <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
             {[
-              { icon: 'ti-database',      label: 'Kondisi Data',  color: '#C4B5FD' },
-              { icon: 'ti-alert-triangle', label: 'Lihat Anomali', color: '#FCD34D' },
+              { icon: 'ti-database',       label: 'Kondisi Data',  bg: '#DCFCE7', border: '#86EFAC', color: '#14532D' },
+              { icon: 'ti-alert-triangle', label: 'Lihat Anomali', bg: '#FEF3C7', border: '#FCD34D', color: '#78350F' },
             ].map(btn => (
               <span key={btn.label} style={{
                 fontSize: 12, fontWeight: 700, padding: '8px 18px', borderRadius: 20,
-                background: 'rgba(255,255,255,0.08)', border: `1px solid ${btn.color}40`,
+                background: btn.bg, border: `1px solid ${btn.border}`,
                 color: btn.color, display: 'flex', alignItems: 'center', gap: 7,
                 cursor: 'default', transition: 'all 0.18s',
               }}
-              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.14)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; e.currentTarget.style.transform = 'translateY(0)'; }}
+              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = `0 4px 12px ${btn.border}80`; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}
               >
                 <i className={`ti ${btn.icon}`} style={{ fontSize: 14 }} aria-hidden />
                 {btn.label}

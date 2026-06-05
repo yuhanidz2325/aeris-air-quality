@@ -16,31 +16,11 @@ body {
 }
 
 /* ── ISPU Categories ─────────────────────────────────────────── */
-.ispu-baik {
-  background: #DCFCE7;
-  border-color: #86EFAC;
-  color: #14532D;
-}
-.ispu-sedang {
-  background: #FEF9C3;
-  border-color: #FDE047;
-  color: #713F12;
-}
-.ispu-tidak-sehat {
-  background: #FEF3C7;
-  border-color: #FCD34D;
-  color: #78350F;
-}
-.ispu-sangat-ts {
-  background: #FEE2E2;
-  border-color: #FCA5A5;
-  color: #7F1D1D;
-}
-.ispu-berbahaya {
-  background: #1E1B4B;
-  border-color: #4338CA;
-  color: #E0E7FF;
-}
+.ispu-baik        { background: #DCFCE7; border-color: #86EFAC; color: #14532D; }
+.ispu-sedang      { background: #FEF9C3; border-color: #FDE047; color: #713F12; }
+.ispu-tidak-sehat { background: #FEF3C7; border-color: #FCD34D; color: #78350F; }
+.ispu-sangat-ts   { background: #FEE2E2; border-color: #FCA5A5; color: #7F1D1D; }
+.ispu-berbahaya   { background: #1E1B4B; border-color: #4338CA; color: #E0E7FF; }
 
 /* ── Base card ───────────────────────────────────────────────── */
 .card {
@@ -51,7 +31,6 @@ body {
   box-shadow: 0 1px 4px rgba(15, 23, 42, 0.05);
   transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
-
 .card:hover {
   box-shadow: 0 6px 20px rgba(15, 23, 42, 0.10);
   transform: translateY(-2px);
@@ -77,7 +56,6 @@ body {
   border: 1px solid transparent;
   letter-spacing: 0.02em;
 }
-
 .badge-green  { background: #DCFCE7; color: #14532D; border-color: #86EFAC; }
 .badge-blue   { background: #DBEAFE; color: #1E40AF; border-color: #93C5FD; }
 .badge-amber  { background: #FEF3C7; color: #78350F; border-color: #FCD34D; }
@@ -90,7 +68,7 @@ body {
   animation: pulseBadge 2s infinite;
 }
 
-/* ── Nav button base ─────────────────────────────────────────── */
+/* ── Nav button ──────────────────────────────────────────────── */
 .nav-btn {
   width: 100%;
   border: none;
@@ -106,18 +84,15 @@ body {
   background: transparent;
   text-align: left;
   padding: 10px 12px;
-  transition: background 0.18s ease, color 0.18s ease,
-              transform 0.18s ease, box-shadow 0.18s ease;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
   border-left: 3px solid transparent;
 }
-
 .nav-btn:hover {
   background: #F1F5F9;
   color: #334155;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
 }
-
 .nav-btn.active {
   background: #EFF6FF;
   color: #1D4ED8;
@@ -126,25 +101,21 @@ body {
   padding-left: 9px;
   box-shadow: 0 2px 8px rgba(37, 99, 235, 0.12);
 }
-
 .nav-btn.active:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(37, 99, 235, 0.18);
 }
 
-/* ── Polutan stat card hover ─────────────────────────────────── */
+/* ── Polutan card ────────────────────────────────────────────── */
 .polutan-card {
   border-radius: 16px;
   padding: 16px;
   transition: box-shadow 0.2s ease, transform 0.2s ease;
   cursor: default;
 }
+.polutan-card:hover { transform: translateY(-3px); }
 
-.polutan-card:hover {
-  transform: translateY(-3px);
-}
-
-/* ── Section title label ─────────────────────────────────────── */
+/* ── Section label ───────────────────────────────────────────── */
 .section-label {
   font-size: 10px;
   font-weight: 700;
@@ -156,7 +127,7 @@ body {
 
 /* ── Scrollbar ───────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: #F0F4FF; }
+::-webkit-scrollbar-track { background: #F8FAFC; }
 ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
 
@@ -165,40 +136,46 @@ body {
   0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.35); }
   50%       { box-shadow: 0 0 0 6px rgba(220, 38, 38, 0); }
 }
-
 @keyframes pulseDot {
   0%, 100% { transform: scale(1); opacity: 1; }
   50%       { transform: scale(1.35); opacity: 0.7; }
 }
-
 @keyframes spin {
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
 }
-
 @keyframes fadeSlideUp {
   from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-
 @keyframes fadeIn {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
-
-/* ── Tab content entrance ────────────────────────────────────── */
-.tab-content {
-  animation: fadeSlideUp 0.25s ease both;
+@keyframes waveMove1 {
+  0%   { transform: translateX(0);    }
+  100% { transform: translateX(-50%); }
+}
+@keyframes waveMove2 {
+  0%   { transform: translateX(-50%); }
+  100% { transform: translateX(0);    }
+}
+@keyframes waveMove3 {
+  0%   { transform: translateX(0);    }
+  100% { transform: translateX(-50%); }
 }
 
-/* ── Sidebar transition ──────────────────────────────────────── */
+/* ── Tab content ─────────────────────────────────────────────── */
+.tab-content { animation: fadeSlideUp 0.25s ease both; }
+
+/* ── Sidebar ─────────────────────────────────────────────────── */
 .sidebar-text {
   overflow: hidden;
   white-space: nowrap;
   transition: opacity 0.2s ease, width 0.2s ease;
 }
 
-/* ── Toggle button (sidebar collapse) ───────────────────────── */
+/* ── Toggle button ───────────────────────────────────────────── */
 .toggle-btn {
   width: 26px;
   height: 26px;
@@ -213,237 +190,6 @@ body {
   transition: all 0.15s ease;
   flex-shrink: 0;
 }
-
-.toggle-btn:hover {
-  background: #EFF6FF;
-  border-color: #BFDBFE;
-  color: #2563EB;
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.14);
-}
-
-/* ── Utility ─────────────────────────────────────────────────── */
-.text-muted  { color: #94A3B8; }
-.text-dark   { color: #0F172A; }
-.text-medium { color: #475569; }
-.fw-800      { font-weight: 800; }
-.fw-700      { font-weight: 700; }
-.fw-600      { font-weight: 600; }
-.fw-500      { font-weight: 500; }@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  font-family: 'Plus Jakarta Sans', 'Inter', 'Segoe UI', sans-serif;
-  background-color: #F0F4FF;
-  color: #0F172A;
-  min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* ── ISPU Categories ─────────────────────────────────────────── */
-.ispu-baik {
-  background: #DCFCE7;
-  border-color: #86EFAC;
-  color: #14532D;
-}
-.ispu-sedang {
-  background: #FEF9C3;
-  border-color: #FDE047;
-  color: #713F12;
-}
-.ispu-tidak-sehat {
-  background: #FEF3C7;
-  border-color: #FCD34D;
-  color: #78350F;
-}
-.ispu-sangat-ts {
-  background: #FEE2E2;
-  border-color: #FCA5A5;
-  color: #7F1D1D;
-}
-.ispu-berbahaya {
-  background: #1E1B4B;
-  border-color: #4338CA;
-  color: #E0E7FF;
-}
-
-/* ── Base card ───────────────────────────────────────────────── */
-.card {
-  background: #ffffff;
-  border: 1px solid #E2E8F0;
-  border-radius: 18px;
-  padding: 20px;
-  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.05);
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
-}
-
-.card:hover {
-  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.10);
-  transform: translateY(-2px);
-}
-
-/* ── Colored stat cards ──────────────────────────────────────── */
-.card-green  { background: #DCFCE7; border: 1px solid #86EFAC; }
-.card-blue   { background: #DBEAFE; border: 1px solid #93C5FD; }
-.card-amber  { background: #FEF3C7; border: 1px solid #FCD34D; }
-.card-purple { background: #EDE9FE; border: 1px solid #C4B5FD; }
-.card-red    { background: #FFE4E6; border: 1px solid #FECDD3; }
-.card-dark   { background: #0F172A; border: 1px solid #1E293B; }
-
-/* ── Badge / pill ────────────────────────────────────────────── */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 4px 12px;
-  border-radius: 20px;
-  border: 1px solid transparent;
-  letter-spacing: 0.02em;
-}
-
-.badge-green  { background: #DCFCE7; color: #14532D; border-color: #86EFAC; }
-.badge-blue   { background: #DBEAFE; color: #1E40AF; border-color: #93C5FD; }
-.badge-amber  { background: #FEF3C7; color: #78350F; border-color: #FCD34D; }
-.badge-red    { background: #FEE2E2; color: #7F1D1D; border-color: #FCA5A5; }
-.badge-gray   { background: #F1F5F9; color: #475569; border-color: #E2E8F0; }
-.badge-live   {
-  background: #FEE2E2;
-  color: #DC2626;
-  border-color: #FECACA;
-  animation: pulseBadge 2s infinite;
-}
-
-/* ── Nav button base ─────────────────────────────────────────── */
-.nav-btn {
-  width: 100%;
-  border: none;
-  cursor: pointer;
-  border-radius: 12px;
-  font-family: inherit;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 13.5px;
-  font-weight: 500;
-  color: #64748B;
-  background: transparent;
-  text-align: left;
-  padding: 10px 12px;
-  transition: background 0.18s ease, color 0.18s ease,
-              transform 0.18s ease, box-shadow 0.18s ease;
-  border-left: 3px solid transparent;
-}
-
-.nav-btn:hover {
-  background: #F1F5F9;
-  color: #334155;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
-}
-
-.nav-btn.active {
-  background: #EFF6FF;
-  color: #1D4ED8;
-  font-weight: 700;
-  border-left: 3px solid #2563EB;
-  padding-left: 9px;
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.12);
-}
-
-.nav-btn.active:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.18);
-}
-
-/* ── Polutan stat card hover ─────────────────────────────────── */
-.polutan-card {
-  border-radius: 16px;
-  padding: 16px;
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
-  cursor: default;
-}
-
-.polutan-card:hover {
-  transform: translateY(-3px);
-}
-
-/* ── Section title label ─────────────────────────────────────── */
-.section-label {
-  font-size: 10px;
-  font-weight: 700;
-  color: #94A3B8;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-bottom: 14px;
-}
-
-/* ── Scrollbar ───────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: #F0F4FF; }
-::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
-
-/* ── Animations ──────────────────────────────────────────────── */
-@keyframes pulseBadge {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.35); }
-  50%       { box-shadow: 0 0 0 6px rgba(220, 38, 38, 0); }
-}
-
-@keyframes pulseDot {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50%       { transform: scale(1.35); opacity: 0.7; }
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
-
-@keyframes fadeSlideUp {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-/* ── Tab content entrance ────────────────────────────────────── */
-.tab-content {
-  animation: fadeSlideUp 0.25s ease both;
-}
-
-/* ── Sidebar transition ──────────────────────────────────────── */
-.sidebar-text {
-  overflow: hidden;
-  white-space: nowrap;
-  transition: opacity 0.2s ease, width 0.2s ease;
-}
-
-/* ── Toggle button (sidebar collapse) ───────────────────────── */
-.toggle-btn {
-  width: 26px;
-  height: 26px;
-  border-radius: 8px;
-  border: 1px solid #E2E8F0;
-  background: #F8FAFC;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: #64748B;
-  transition: all 0.15s ease;
-  flex-shrink: 0;
-}
-
 .toggle-btn:hover {
   background: #EFF6FF;
   border-color: #BFDBFE;

@@ -469,11 +469,13 @@ function App() {
   return (
     <div style={{
       minHeight: '100vh',
+      height: '100vh',
       background: '#F8FAFC',
       color: '#0F172A',
       fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
       display: 'flex',
       flexDirection: 'column',
+      overflow: 'hidden',
     }}>
 
       {/* ── NAVBAR ── */}
@@ -524,8 +526,10 @@ function App() {
           padding: collapsed ? '20px 8px' : '20px 12px',
           display: 'flex', flexDirection: 'column',
           transition: 'width 0.25s ease, min-width 0.25s ease, padding 0.25s ease',
-          overflow: 'hidden', boxShadow: '1px 0 6px rgba(15,23,42,0.04)',
+          overflowY: 'auto',
+          boxShadow: '1px 0 6px rgba(15,23,42,0.04)',
           position: 'relative', flexShrink: 0,
+          height: '100%',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: collapsed ? 'center' : 'space-between', marginBottom: 24, paddingLeft: collapsed ? 0 : 4 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
@@ -594,7 +598,7 @@ function App() {
         </aside>
 
         {/* ── MAIN ── */}
-        <main style={{ flex: 1, padding: '20px 24px', overflowY: 'auto', background: '#F8FAFC' }}>
+        <main style={{ flex: 1, padding: '20px 24px', overflowY: 'auto', background: '#F8FAFC', height: '100%' }}>
           {activeTab === 'beranda'  && <TabBeranda statusData={statusData} loading={loading} />}
           {activeTab === 'grafik'   && <GrafikTren baseUrl={BASE_URL} />}
           {activeTab === 'anomali'  && <DeteksiAnomali baseUrl={BASE_URL} />}

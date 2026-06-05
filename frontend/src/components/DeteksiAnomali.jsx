@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, ReferenceLine, Cell, BarChart, Bar
+  Tooltip, ResponsiveContainer, ReferenceLine
 } from 'recharts';
 
 const BASE_URL = import.meta.env.VITE_API_URL;
 
 const SEVERITY_CONFIG = {
-  Low:    { bg: '#DCFCE7', border: '#86EFAC', text: '#14532D', dot: '#22C55E', label: 'Rendah'  },
-  Medium: { bg: '#FEF3C7', border: '#FCD34D', text: '#78350F', dot: '#F59E0B', label: 'Sedang'  },
-  High:   { bg: '#FEE2E2', border: '#FECACA', text: '#7F1D1D', dot: '#EF4444', label: 'Tinggi'  },
+  Low:    { bg: '#DCFCE7', border: '#86EFAC', text: '#14532D', dot: '#22C55E', label: 'Rendah' },
+  Medium: { bg: '#FEF3C7', border: '#FCD34D', text: '#78350F', dot: '#F59E0B', label: 'Sedang' },
+  High:   { bg: '#FEE2E2', border: '#FECACA', text: '#7F1D1D', dot: '#EF4444', label: 'Tinggi' },
 };
 
 const POLUTAN_COLOR = {
@@ -69,24 +69,6 @@ function CustomTooltip({ active, payload, label }) {
   );
 }
 
-function ChartLoading() {
-  return (
-    <div style={{
-      height: 260, display: 'flex', alignItems: 'center', justifyContent: 'center',
-      background: '#F8FAFC', borderRadius: 12, border: '1px solid #E2E8F0',
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#94A3B8' }}>
-        <span style={{
-          width: 18, height: 18, border: '2.5px solid #CBD5E1',
-          borderTop: '2.5px solid #2563EB', borderRadius: '50%',
-          animation: 'spin 1s linear infinite', display: 'inline-block',
-        }} />
-        <span style={{ fontSize: 13, fontWeight: 500 }}>Memuat data...</span>
-      </div>
-    </div>
-  );
-}
-
 function DeteksiAnomali({ baseUrl }) {
   const [statusData,        setStatusData]        = useState(null);
   const [loading,           setLoading]           = useState(true);
@@ -103,7 +85,6 @@ function DeteksiAnomali({ baseUrl }) {
       } catch (err) {
         console.error('Gagal fetch status:', err);
       }
-
       try {
         const endDate   = new Date().toISOString().split('T')[0];
         const startDate = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0];
@@ -153,12 +134,8 @@ function DeteksiAnomali({ baseUrl }) {
     ? anomalyEvents.reduce((a, b) => a.value > b.value ? a : b).timestamp : null;
 
   const generateInsight = () => {
-    if (activeAnomaly) {
-      return `Terdeteksi lonjakan tidak wajar pada parameter ${activeAnomaly.parameter.toUpperCase()} dengan nilai tertinggi ${Math.round(activeAnomaly.value)}. Puncak anomali terjadi pada pukul ${peakAnomalyHour || '—'} WIB. Disarankan untuk memantau perkembangan kualitas udara secara berkala.`;
-    }
-    if (anomalyEvents.length > 0) {
-      return `Terdeteksi ${anomalyEvents.length} kejadian fluktuasi nilai di atas ambang batas normal pada parameter ${POLUTAN_LABEL[selectedParameter]}. Secara keseluruhan kualitas udara masih dalam kategori terkendali.`;
-    }
+    if (activeAnomaly) return `Terdeteksi lonjakan tidak wajar pada parameter ${activeAnomaly.parameter.toUpperCase()} dengan nilai tertinggi ${Math.round(activeAnomaly.value)}. Puncak anomali terjadi pada pukul ${peakAnomalyHour || '—'} WIB. Disarankan untuk memantau perkembangan kualitas udara secara berkala.`;
+    if (anomalyEvents.length > 0) return `Terdeteksi ${anomalyEvents.length} kejadian fluktuasi nilai di atas ambang batas normal pada parameter ${POLUTAN_LABEL[selectedParameter]}. Secara keseluruhan kualitas udara masih dalam kategori terkendali.`;
     return `Tidak ditemukan anomali signifikan pada seluruh parameter kualitas udara dalam 24 jam terakhir. Seluruh polutan masih berada pada rentang normal dan relatif stabil.`;
   };
 
@@ -168,17 +145,22 @@ function DeteksiAnomali({ baseUrl }) {
     background: '#F8FAFC', color: '#64748B', transition: 'all 0.18s ease',
   };
 
+  /* ── Hero colors based on anomaly status ── */
+  const heroConfig = activeAnomaly
+    ? { bg: 'linear-gradient(135deg, #FEE2E2 0%, #FEF3C7 50%, #FFE4E6 100%)', border: '#FECACA', titleColor: '#7F1D1D', subColor: '#B91C1C', badgeColor: '#DC2626', badgeBg: 'rgba(220,38,38,0.1)', badgeBorder: 'rgba(220,38,38,0.25)' }
+    : { bg: 'linear-gradient(135deg, #DCFCE7 0%, #DBEAFE 50%, #EDE9FE 100%)', border: '#E2E8F0', titleColor: '#14532D', subColor: '#166534', badgeColor: '#16A34A', badgeBg: 'rgba(22,163,74,0.1)', badgeBorder: 'rgba(22,163,74,0.25)' };
+
   if (loading) return (
     <div className="tab-content" style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
       <section style={{
-        background: 'linear-gradient(145deg, #0B1F3A 0%, #0D3B6E 55%, #1058A8 100%)',
+        background: 'linear-gradient(135deg, #DCFCE7 0%, #DBEAFE 50%, #EDE9FE 100%)',
         borderRadius: 24, padding: '36px', marginBottom: 28,
-        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-        minHeight: 200,
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        justifyContent: 'center', minHeight: 200, border: '1.5px solid #E2E8F0',
       }}>
-        <i className="ti ti-zoom-scan" style={{ fontSize: 48, color: '#475569', marginBottom: 16 }} aria-hidden />
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#94A3B8' }}>
-          <span style={{ width: 18, height: 18, border: '2.5px solid #475569', borderTop: '2.5px solid #60A5FA', borderRadius: '50%', animation: 'spin 1s linear infinite', display: 'inline-block' }} />
+        <i className="ti ti-zoom-scan" style={{ fontSize: 48, color: '#2563EB', marginBottom: 16 }} aria-hidden />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#1D4ED8' }}>
+          <span style={{ width: 18, height: 18, border: '2.5px solid #93C5FD', borderTop: '2.5px solid #2563EB', borderRadius: '50%', animation: 'spin 1s linear infinite', display: 'inline-block' }} />
           <span style={{ fontSize: 15, fontWeight: 600 }}>Memuat analisis anomali...</span>
         </div>
       </section>
@@ -188,23 +170,21 @@ function DeteksiAnomali({ baseUrl }) {
   return (
     <div className="tab-content" style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
 
-      {/* ── HERO SECTION ── */}
+      {/* ── HERO SECTION — soft ── */}
       <section style={{
-        background: activeAnomaly
-          ? 'linear-gradient(145deg, #3B0000 0%, #7F1D1D 55%, #DC2626 100%)'
-          : 'linear-gradient(145deg, #0B1F3A 0%, #0D3B6E 55%, #1058A8 100%)',
-        borderRadius: 24, padding: '36px', position: 'relative', overflow: 'hidden', marginBottom: 28,
+        background: heroConfig.bg,
+        borderRadius: 24, padding: '36px', position: 'relative',
+        overflow: 'hidden', marginBottom: 28,
+        border: `1.5px solid ${heroConfig.border}`,
       }}>
-        <div style={{ position: 'absolute', top: -50, right: -50, width: 220, height: 220, borderRadius: '50%', background: 'rgba(255,255,255,0.07)', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', bottom: -30, left: -30, width: 160, height: 160, borderRadius: '50%', background: 'rgba(255,255,255,0.05)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', top: -50, right: -50, width: 220, height: 220, borderRadius: '50%', background: 'rgba(255,255,255,0.3)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', bottom: -30, left: -30, width: 160, height: 160, borderRadius: '50%', background: 'rgba(255,255,255,0.2)', pointerEvents: 'none' }} />
 
         <div style={{ position: 'relative' }}>
           <span style={{
-            fontSize: 11, fontWeight: 700,
-            color: activeAnomaly ? '#FCA5A5' : '#60A5FA',
-            background: activeAnomaly ? 'rgba(239,68,68,0.2)' : 'rgba(59,130,246,0.15)',
-            padding: '5px 16px', borderRadius: 20,
-            border: `1px solid ${activeAnomaly ? 'rgba(239,68,68,0.4)' : 'rgba(59,130,246,0.3)'}`,
+            fontSize: 11, fontWeight: 700, color: heroConfig.badgeColor,
+            background: heroConfig.badgeBg, padding: '5px 16px',
+            borderRadius: 20, border: `1px solid ${heroConfig.badgeBorder}`,
             display: 'inline-flex', alignItems: 'center', gap: 6,
             letterSpacing: '0.06em', marginBottom: 16,
           }}>
@@ -212,10 +192,10 @@ function DeteksiAnomali({ baseUrl }) {
             DETEKSI ANOMALI · 24 JAM TERAKHIR
           </span>
 
-          <div style={{ fontSize: 36, fontWeight: 800, color: '#fff', marginBottom: 10, letterSpacing: '-0.02em' }}>
+          <div style={{ fontSize: 36, fontWeight: 800, color: heroConfig.titleColor, marginBottom: 10, letterSpacing: '-0.02em' }}>
             {activeAnomaly ? '⚠ Anomali Terdeteksi!' : 'Kondisi Udara Normal'}
           </div>
-          <div style={{ fontSize: 14, color: '#94A3B8', lineHeight: 1.7, marginBottom: 24, maxWidth: 520 }}>
+          <div style={{ fontSize: 14, color: heroConfig.subColor, lineHeight: 1.7, marginBottom: 24, maxWidth: 520, opacity: 0.85 }}>
             {activeAnomaly
               ? `Ditemukan lonjakan tidak wajar pada parameter ${activeAnomaly.parameter.toUpperCase()}. Pantau terus kondisi kualitas udara dan ambil tindakan pencegahan.`
               : 'Tidak ditemukan anomali signifikan dalam 24 jam terakhir. Seluruh parameter polutan berada dalam rentang normal.'
@@ -224,32 +204,23 @@ function DeteksiAnomali({ baseUrl }) {
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
             {[
-              {
-                icon: activeAnomaly ? 'ti-alert-triangle' : 'ti-shield-check',
-                label: 'Status Anomali',
-                value: activeAnomaly ? 'Terdeteksi' : 'Normal',
-                color: activeAnomaly ? '#FCA5A5' : '#34D399',
-              },
-              { icon: 'ti-zoom-scan',    label: 'Total Kejadian',    value: anomalyEvents.length, color: '#C4B5FD' },
-              { icon: 'ti-clock',        label: 'Puncak Anomali',    value: peakAnomalyHour || '—', color: '#FCD34D' },
-              {
-                icon: 'ti-alert-circle',
-                label: 'Severity Tertinggi',
-                value: severityCount.High > 0 ? 'Tinggi' : severityCount.Medium > 0 ? 'Sedang' : severityCount.Low > 0 ? 'Rendah' : '—',
-                color: severityCount.High > 0 ? '#FCA5A5' : severityCount.Medium > 0 ? '#FCD34D' : '#34D399',
-              },
+              { icon: activeAnomaly ? 'ti-alert-triangle' : 'ti-shield-check', label: 'Status Anomali',    value: activeAnomaly ? 'Terdeteksi' : 'Normal',         color: activeAnomaly ? '#DC2626' : '#16A34A', bg: activeAnomaly ? 'rgba(220,38,38,0.08)' : 'rgba(22,163,74,0.08)',    border: activeAnomaly ? 'rgba(220,38,38,0.2)' : 'rgba(22,163,74,0.2)'   },
+              { icon: 'ti-zoom-scan',    label: 'Total Kejadian',    value: anomalyEvents.length,           color: '#2563EB', bg: 'rgba(37,99,235,0.08)',   border: 'rgba(37,99,235,0.2)'  },
+              { icon: 'ti-clock',        label: 'Puncak Anomali',    value: peakAnomalyHour || '—',         color: '#D97706', bg: 'rgba(217,119,6,0.08)',   border: 'rgba(217,119,6,0.2)'  },
+              { icon: 'ti-alert-circle', label: 'Severity Tertinggi', value: severityCount.High > 0 ? 'Tinggi' : severityCount.Medium > 0 ? 'Sedang' : severityCount.Low > 0 ? 'Rendah' : '—', color: severityCount.High > 0 ? '#DC2626' : severityCount.Medium > 0 ? '#D97706' : '#16A34A', bg: severityCount.High > 0 ? 'rgba(220,38,38,0.08)' : severityCount.Medium > 0 ? 'rgba(217,119,6,0.08)' : 'rgba(22,163,74,0.08)', border: severityCount.High > 0 ? 'rgba(220,38,38,0.2)' : severityCount.Medium > 0 ? 'rgba(217,119,6,0.2)' : 'rgba(22,163,74,0.2)' },
             ].map(item => (
               <div key={item.label} style={{
-                background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.10)',
-                borderRadius: 12, padding: '12px 14px', borderLeft: `3px solid ${item.color}`,
-                transition: 'background 0.2s, transform 0.2s', cursor: 'default',
+                background: item.bg, border: `1px solid ${item.border}`,
+                borderRadius: 12, padding: '12px 14px',
+                borderLeft: `3px solid ${item.color}`,
+                transition: 'transform 0.2s', cursor: 'default',
               }}
-              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.12)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.07)'; e.currentTarget.style.transform = 'translateY(0)'; }}
+              onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
+              onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
               >
                 <i className={`ti ${item.icon}`} style={{ fontSize: 16, color: item.color, display: 'block', marginBottom: 6 }} aria-hidden />
-                <div style={{ fontSize: 10, fontWeight: 700, color: '#475569', marginBottom: 3, letterSpacing: '0.06em' }}>{item.label.toUpperCase()}</div>
-                <div style={{ fontSize: 16, fontWeight: 800, color: '#fff' }}>{item.value}</div>
+                <div style={{ fontSize: 10, fontWeight: 700, color: item.color, marginBottom: 3, letterSpacing: '0.06em', opacity: 0.8 }}>{item.label.toUpperCase()}</div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: heroConfig.titleColor }}>{item.value}</div>
               </div>
             ))}
           </div>
@@ -278,7 +249,7 @@ function DeteksiAnomali({ baseUrl }) {
                 onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = `0 8px 20px ${isNormal ? st.border : cfg.border}80`; }}
                 onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}
               >
-                <div style={{ fontSize: 12, fontWeight: 700, color: isNormal ? st.textColor : cfg.text, marginBottom: 8, letterSpacing: '0.04em' }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: isNormal ? st.textColor : cfg.text, marginBottom: 8 }}>
                   {POLUTAN_LABEL[key] || key.toUpperCase()}
                 </div>
                 <div style={{ fontSize: 34, fontWeight: 800, color: isNormal ? st.textColor : cfg.text, lineHeight: 1, marginBottom: 8 }}>
@@ -303,14 +274,10 @@ function DeteksiAnomali({ baseUrl }) {
 
       {/* ── GRAFIK SECTION ── */}
       <section style={{ marginBottom: 28 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, flexWrap: 'wrap', gap: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, flexWrap: 'wrap', gap: 10 }}>
           <div>
-            <div style={{ fontSize: 20, fontWeight: 800, color: '#0F172A', marginBottom: 3 }}>
-              Tren Historis dengan Deteksi Anomali
-            </div>
-            <div style={{ fontSize: 13, color: '#64748B' }}>
-              Titik berwarna menandai kejadian anomali · 24 jam terakhir
-            </div>
+            <div style={{ fontSize: 20, fontWeight: 800, color: '#0F172A', marginBottom: 3 }}>Tren Historis dengan Deteksi Anomali</div>
+            <div style={{ fontSize: 13, color: '#64748B' }}>Titik berwarna menandai kejadian anomali · 24 jam terakhir</div>
           </div>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             {Object.keys(POLUTAN_LABEL).map(key => {
@@ -382,8 +349,7 @@ function DeteksiAnomali({ baseUrl }) {
               <div>
                 <div style={{ fontSize: 10, fontWeight: 700, color: item.color, opacity: 0.75, letterSpacing: '0.05em', marginBottom: 3 }}>{item.label.toUpperCase()}</div>
                 <div style={{ fontSize: 24, fontWeight: 800, color: item.color, lineHeight: 1 }}>
-                  {item.value}
-                  <span style={{ fontSize: 11, fontWeight: 600, marginLeft: 3, opacity: 0.7 }}>µg/m³</span>
+                  {item.value}<span style={{ fontSize: 11, fontWeight: 600, marginLeft: 3, opacity: 0.7 }}>µg/m³</span>
                 </div>
               </div>
             </div>
@@ -395,7 +361,6 @@ function DeteksiAnomali({ baseUrl }) {
       <section style={{ marginBottom: 8 }}>
         <div style={{ fontSize: 20, fontWeight: 800, color: '#0F172A', marginBottom: 4 }}>Insight Anomali</div>
         <div style={{ fontSize: 13, color: '#64748B', marginBottom: 16 }}>Analisis otomatis berdasarkan data 24 jam terakhir</div>
-
         <div style={{
           background: activeAnomaly ? '#FEF3C7' : anomalyEvents.length > 0 ? '#DBEAFE' : '#DCFCE7',
           border: `1.5px solid ${activeAnomaly ? '#FCD34D' : anomalyEvents.length > 0 ? '#93C5FD' : '#86EFAC'}`,
@@ -409,18 +374,14 @@ function DeteksiAnomali({ baseUrl }) {
             </div>
             <div>
               <div style={{ fontSize: 16, fontWeight: 800, color: '#0F172A' }}>
-                {activeAnomaly ? 'Perlu Perhatian Segera'
-                  : anomalyEvents.length > 0 ? 'Fluktuasi Terdeteksi'
-                  : 'Kondisi Stabil'}
+                {activeAnomaly ? 'Perlu Perhatian Segera' : anomalyEvents.length > 0 ? 'Fluktuasi Terdeteksi' : 'Kondisi Stabil'}
               </div>
               <div style={{ fontSize: 12, color: '#64748B', marginTop: 2 }}>Berdasarkan data 24 jam terakhir</div>
             </div>
           </div>
-
           <div style={{ background: 'rgba(255,255,255,0.65)', borderRadius: 12, padding: '14px 18px', fontSize: 13, lineHeight: 1.8, color: '#475569', marginBottom: 16 }}>
             {generateInsight()}
           </div>
-
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             {[
               { icon: 'ti-satellite', label: 'Data: 24 jam terakhir'   },
@@ -440,33 +401,32 @@ function DeteksiAnomali({ baseUrl }) {
         </div>
       </section>
 
-      {/* ── FOOTER CTA ── */}
+      {/* ── FOOTER CTA — soft ── */}
       <section style={{
-        background: 'linear-gradient(145deg, #0B1F3A 0%, #0D3B6E 60%, #1058A8 100%)',
+        background: 'linear-gradient(135deg, #DCFCE7 0%, #DBEAFE 50%, #EDE9FE 100%)',
         borderRadius: 20, padding: '28px 32px', textAlign: 'center',
         position: 'relative', overflow: 'hidden', marginTop: 20,
+        border: '1.5px solid #E2E8F0',
       }}>
-        <div style={{ position: 'absolute', top: -30, right: -30, width: 160, height: 160, borderRadius: '50%', background: 'rgba(59,130,246,0.13)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', top: -30, right: -30, width: 160, height: 160, borderRadius: '50%', background: 'rgba(22,163,74,0.1)', pointerEvents: 'none' }} />
         <div style={{ position: 'relative' }}>
-          <div style={{ fontSize: 18, fontWeight: 800, color: '#fff', marginBottom: 8 }}>
-            Ingin melihat prediksi ke depan?
-          </div>
-          <p style={{ fontSize: 13, color: '#94A3B8', lineHeight: 1.7, marginBottom: 16 }}>
+          <div style={{ fontSize: 18, fontWeight: 800, color: '#0F172A', marginBottom: 8 }}>Ingin melihat prediksi ke depan?</div>
+          <p style={{ fontSize: 13, color: '#475569', lineHeight: 1.7, marginBottom: 16 }}>
             Gunakan tab Prediksi untuk melihat forecast kualitas udara 3 jam ke depan menggunakan model Random Forest.
           </p>
           <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
             {[
-              { icon: 'ti-crystal-ball', label: 'Lihat Prediksi',  color: '#60A5FA' },
-              { icon: 'ti-chart-line',   label: 'Grafik & Tren',   color: '#34D399' },
+              { icon: 'ti-crystal-ball', label: 'Lihat Prediksi', bg: '#EDE9FE', border: '#C4B5FD', color: '#3B0764' },
+              { icon: 'ti-chart-line',   label: 'Grafik & Tren', bg: '#DBEAFE', border: '#93C5FD', color: '#1E3A8A' },
             ].map(btn => (
               <span key={btn.label} style={{
                 fontSize: 12, fontWeight: 700, padding: '8px 18px', borderRadius: 20,
-                background: 'rgba(255,255,255,0.08)', border: `1px solid ${btn.color}40`,
+                background: btn.bg, border: `1px solid ${btn.border}`,
                 color: btn.color, display: 'flex', alignItems: 'center', gap: 7,
                 cursor: 'default', transition: 'all 0.18s',
               }}
-              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.14)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; e.currentTarget.style.transform = 'translateY(0)'; }}
+              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = `0 4px 12px ${btn.border}80`; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}
               >
                 <i className={`ti ${btn.icon}`} style={{ fontSize: 14 }} aria-hidden />
                 {btn.label}

@@ -245,57 +245,63 @@ function GrafikTren({ baseUrl }) {
   return (
     <div className="tab-content" style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
 
-      {/* ── HERO SECTION ── */}
+      {/* ── HERO SECTION — soft blue ── */}
       <section style={{
-        background: 'linear-gradient(145deg, #0B1F3A 0%, #0D3B6E 55%, #1058A8 100%)',
-        borderRadius: 24, padding: '36px', position: 'relative', overflow: 'hidden', marginBottom: 28,
+        background: 'linear-gradient(135deg, #DBEAFE 0%, #EDE9FE 50%, #DCFCE7 100%)',
+        borderRadius: 24, padding: '36px', position: 'relative',
+        overflow: 'hidden', marginBottom: 28, border: '1.5px solid #E2E8F0',
       }}>
-        <div style={{ position: 'absolute', top: -50, right: -50, width: 220, height: 220, borderRadius: '50%', background: 'rgba(59,130,246,0.13)', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', bottom: -30, left: -30, width: 160, height: 160, borderRadius: '50%', background: 'rgba(16,185,129,0.09)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', top: -50, right: -50, width: 220, height: 220, borderRadius: '50%', background: 'rgba(255,255,255,0.35)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', bottom: -30, left: -30, width: 160, height: 160, borderRadius: '50%', background: 'rgba(255,255,255,0.25)', pointerEvents: 'none' }} />
+
         <div style={{ position: 'relative' }}>
           <span style={{
-            fontSize: 11, fontWeight: 700, color: '#60A5FA',
-            background: 'rgba(59,130,246,0.15)', padding: '5px 16px',
-            borderRadius: 20, border: '1px solid rgba(59,130,246,0.3)',
+            fontSize: 11, fontWeight: 700, color: '#1D4ED8',
+            background: 'rgba(37,99,235,0.1)', padding: '5px 16px',
+            borderRadius: 20, border: '1px solid rgba(37,99,235,0.25)',
             display: 'inline-flex', alignItems: 'center', gap: 6,
             letterSpacing: '0.06em', marginBottom: 16,
           }}>
             <i className="ti ti-chart-line" style={{ fontSize: 12 }} aria-hidden />
             VISUALISASI DATA HISTORIS
           </span>
-          <div style={{ fontSize: 36, fontWeight: 800, color: '#fff', marginBottom: 10, letterSpacing: '-0.02em' }}>
+
+          <div style={{ fontSize: 36, fontWeight: 800, color: '#1E3A8A', marginBottom: 10, letterSpacing: '-0.02em' }}>
             Grafik & Tren Polutan
           </div>
-          <div style={{ fontSize: 14, color: '#94A3B8', lineHeight: 1.7, marginBottom: 24, maxWidth: 520 }}>
+          <div style={{ fontSize: 14, color: '#1D4ED8', lineHeight: 1.7, marginBottom: 24, maxWidth: 520, opacity: 0.8 }}>
             Analisis tren historis konsentrasi polutan udara Surabaya. Pilih rentang waktu, jenis polutan, dan mode tampilan untuk eksplorasi data yang lebih mendalam.
           </div>
 
-          {/* Stats strip */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
             {[
-              { icon: 'ti-database',  label: 'Total Data',    value: `${data.length} titik`,     color: '#60A5FA' },
-              { icon: 'ti-clock',     label: 'Rentang',       value: RENTANG_OPTIONS.find(r => r.key === rentang)?.label || '—', color: '#34D399' },
-              { icon: 'ti-layers',    label: 'Mode Tampilan', value: VIEW_OPTIONS.find(v => v.key === viewMode)?.label || '—', color: '#C4B5FD' },
-              { icon: 'ti-leaf',      label: 'Polutan Aktif', value: POLUTAN_CONFIG[polutanAktif]?.label || '—', color: '#FCD34D' },
+              { icon: 'ti-database',  label: 'Total Data',    value: `${data.length} titik`,                                              color: '#1D4ED8', bg: 'rgba(37,99,235,0.08)',  border: 'rgba(37,99,235,0.2)'  },
+              { icon: 'ti-clock',     label: 'Rentang',       value: RENTANG_OPTIONS.find(r => r.key === rentang)?.label || '—',          color: '#16A34A', bg: 'rgba(22,163,74,0.08)',  border: 'rgba(22,163,74,0.2)'  },
+              { icon: 'ti-layers',    label: 'Mode Tampilan', value: VIEW_OPTIONS.find(v => v.key === viewMode)?.label || '—',            color: '#7C3AED', bg: 'rgba(124,58,237,0.08)', border: 'rgba(124,58,237,0.2)' },
+              { icon: 'ti-leaf',      label: 'Polutan Aktif', value: POLUTAN_CONFIG[polutanAktif]?.label || '—',                          color: '#D97706', bg: 'rgba(217,119,6,0.08)',  border: 'rgba(217,119,6,0.2)'  },
             ].map(item => (
               <div key={item.label} style={{
-                background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.10)',
-                borderRadius: 12, padding: '12px 14px', borderLeft: `3px solid ${item.color}`,
-              }}>
+                background: item.bg, border: `1px solid ${item.border}`,
+                borderRadius: 12, padding: '12px 14px',
+                borderLeft: `3px solid ${item.color}`,
+                transition: 'transform 0.2s', cursor: 'default',
+              }}
+              onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
+              onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
+              >
                 <i className={`ti ${item.icon}`} style={{ fontSize: 16, color: item.color, display: 'block', marginBottom: 6 }} aria-hidden />
-                <div style={{ fontSize: 10, fontWeight: 700, color: '#475569', marginBottom: 3, letterSpacing: '0.06em' }}>{item.label.toUpperCase()}</div>
-                <div style={{ fontSize: 15, fontWeight: 800, color: '#fff' }}>{item.value}</div>
+                <div style={{ fontSize: 10, fontWeight: 700, color: item.color, marginBottom: 3, letterSpacing: '0.06em', opacity: 0.8 }}>{item.label.toUpperCase()}</div>
+                <div style={{ fontSize: 15, fontWeight: 800, color: '#1E3A8A' }}>{item.value}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── KONTROL SECTION ── */}
+      {/* ── KONTROL ── */}
       <section style={{ marginBottom: 24 }}>
         <div style={{ fontSize: 20, fontWeight: 800, color: '#0F172A', marginBottom: 4 }}>Pengaturan Tampilan</div>
         <div style={{ fontSize: 13, color: '#64748B', marginBottom: 16 }}>Pilih rentang waktu dan mode visualisasi</div>
-
         <div style={{ background: '#fff', borderRadius: 18, padding: '20px 22px', border: '1px solid #E2E8F0', boxShadow: '0 1px 4px rgba(15,23,42,0.05)', display: 'flex', flexDirection: 'column', gap: 14 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
             <span style={{ fontSize: 12, fontWeight: 700, color: '#94A3B8', letterSpacing: '0.06em', minWidth: 80 }}>RENTANG</span>
@@ -309,9 +315,7 @@ function GrafikTren({ baseUrl }) {
               ))}
             </div>
           </div>
-
           <div style={{ height: 1, background: '#F1F5F9' }} />
-
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
             <span style={{ fontSize: 12, fontWeight: 700, color: '#94A3B8', letterSpacing: '0.06em', minWidth: 80 }}>MODE</span>
             <div style={{ display: 'flex', gap: 6 }}>
@@ -333,7 +337,6 @@ function GrafikTren({ baseUrl }) {
       {/* ── VIEW: INDIVIDUAL ── */}
       {viewMode === 'individual' && (
         <>
-          {/* Pilih polutan */}
           <section style={{ marginBottom: 24 }}>
             <div style={{ fontSize: 20, fontWeight: 800, color: '#0F172A', marginBottom: 4 }}>Pilih Polutan</div>
             <div style={{ fontSize: 13, color: '#64748B', marginBottom: 16 }}>Klik polutan untuk melihat tren spesifik</div>
@@ -362,15 +365,10 @@ function GrafikTren({ baseUrl }) {
             </div>
           </section>
 
-          {/* Stat cards */}
           {stats && (
             <section style={{ marginBottom: 24 }}>
-              <div style={{ fontSize: 20, fontWeight: 800, color: '#0F172A', marginBottom: 4 }}>
-                Statistik {POLUTAN_CONFIG[polutanAktif].label}
-              </div>
-              <div style={{ fontSize: 13, color: '#64748B', marginBottom: 16 }}>
-                Ringkasan statistik untuk rentang {RENTANG_OPTIONS.find(r => r.key === rentang)?.label}
-              </div>
+              <div style={{ fontSize: 20, fontWeight: 800, color: '#0F172A', marginBottom: 4 }}>Statistik {POLUTAN_CONFIG[polutanAktif].label}</div>
+              <div style={{ fontSize: 13, color: '#64748B', marginBottom: 16 }}>Ringkasan untuk rentang {RENTANG_OPTIONS.find(r => r.key === rentang)?.label}</div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12 }}>
                 {[
                   { label: 'Rata-rata',   value: stats.avg.toFixed(1),    color: '#2563EB', bg: '#DBEAFE', border: '#93C5FD', textColor: '#1E3A8A', icon: 'ti-minus'      },
@@ -400,41 +398,27 @@ function GrafikTren({ baseUrl }) {
             </section>
           )}
 
-          {/* Grafik */}
           <section style={{ marginBottom: 24 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
               <div>
-                <div style={{ fontSize: 20, fontWeight: 800, color: '#0F172A', marginBottom: 3 }}>
-                  Tren {POLUTAN_CONFIG[polutanAktif].label}
-                </div>
-                <div style={{ fontSize: 13, color: '#64748B' }}>
-                  {RENTANG_OPTIONS.find(r => r.key === rentang)?.label} · {data.length} titik data
-                </div>
+                <div style={{ fontSize: 20, fontWeight: 800, color: '#0F172A', marginBottom: 3 }}>Tren {POLUTAN_CONFIG[polutanAktif].label}</div>
+                <div style={{ fontSize: 13, color: '#64748B' }}>{RENTANG_OPTIONS.find(r => r.key === rentang)?.label} · {data.length} titik data</div>
               </div>
-              <span style={{
-                fontSize: 11, fontWeight: 700,
-                color: POLUTAN_STYLE[polutanAktif].textColor,
-                background: POLUTAN_STYLE[polutanAktif].bg,
-                padding: '4px 14px', borderRadius: 20,
-                border: `1px solid ${POLUTAN_STYLE[polutanAktif].border}`,
-              }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: POLUTAN_STYLE[polutanAktif].textColor, background: POLUTAN_STYLE[polutanAktif].bg, padding: '4px 14px', borderRadius: 20, border: `1px solid ${POLUTAN_STYLE[polutanAktif].border}` }}>
                 {POLUTAN_CONFIG[polutanAktif].label} · {POLUTAN_CONFIG[polutanAktif].unit}
               </span>
             </div>
             <div style={{ background: '#fff', borderRadius: 18, padding: '20px 22px', border: '1px solid #E2E8F0', boxShadow: '0 1px 4px rgba(15,23,42,0.05)' }}>
-              {error   && <ChartError />}
+              {error && <ChartError />}
               {loading && <ChartLoading />}
               {!loading && !error && <GrafikPolutan data={data} polutanKey={polutanAktif} />}
             </div>
           </section>
 
-          {/* Ringkasan 5 polutan */}
           {!loading && !error && data.length > 0 && (
             <section style={{ marginBottom: 8 }}>
               <div style={{ fontSize: 20, fontWeight: 800, color: '#0F172A', marginBottom: 4 }}>Ringkasan Semua Polutan</div>
-              <div style={{ fontSize: 13, color: '#64748B', marginBottom: 16 }}>
-                Rata-rata, min, dan maks untuk {RENTANG_OPTIONS.find(r => r.key === rentang)?.label}
-              </div>
+              <div style={{ fontSize: 13, color: '#64748B', marginBottom: 16 }}>Rata-rata, min, dan maks untuk {RENTANG_OPTIONS.find(r => r.key === rentang)?.label}</div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12 }}>
                 {Object.entries(POLUTAN_CONFIG).map(([key, cfg]) => {
                   const s       = POLUTAN_STYLE[key];
@@ -478,11 +462,9 @@ function GrafikTren({ baseUrl }) {
       {viewMode === 'overlay' && (
         <section style={{ marginBottom: 8 }}>
           <div style={{ fontSize: 20, fontWeight: 800, color: '#0F172A', marginBottom: 4 }}>Overlay Semua Polutan</div>
-          <div style={{ fontSize: 13, color: '#64748B', marginBottom: 16 }}>
-            Perbandingan seluruh polutan dalam satu grafik · {RENTANG_OPTIONS.find(r => r.key === rentang)?.label}
-          </div>
+          <div style={{ fontSize: 13, color: '#64748B', marginBottom: 16 }}>Perbandingan seluruh polutan · {RENTANG_OPTIONS.find(r => r.key === rentang)?.label}</div>
           <div style={{ background: '#fff', borderRadius: 18, padding: '20px 22px', border: '1px solid #E2E8F0', boxShadow: '0 1px 4px rgba(15,23,42,0.05)' }}>
-            {error   && <ChartError />}
+            {error && <ChartError />}
             {loading && <ChartLoading />}
             {!loading && !error && <GrafikOverlay data={data} />}
             <div style={{ display: 'flex', gap: 16, marginTop: 14, flexWrap: 'wrap' }}>
@@ -506,49 +488,46 @@ function GrafikTren({ baseUrl }) {
       {viewMode === 'harian' && (
         <section style={{ marginBottom: 8 }}>
           <div style={{ fontSize: 20, fontWeight: 800, color: '#0F172A', marginBottom: 4 }}>Pola Harian PM2.5</div>
-          <div style={{ fontSize: 13, color: '#64748B', marginBottom: 16 }}>
-            Rata-rata konsentrasi per jam · {RENTANG_OPTIONS.find(r => r.key === rentang)?.label}
-          </div>
+          <div style={{ fontSize: 13, color: '#64748B', marginBottom: 16 }}>Rata-rata konsentrasi per jam · {RENTANG_OPTIONS.find(r => r.key === rentang)?.label}</div>
           <div style={{ background: '#fff', borderRadius: 18, padding: '20px 22px', border: '1px solid #E2E8F0', boxShadow: '0 1px 4px rgba(15,23,42,0.05)' }}>
-            {error   && <ChartError />}
+            {error && <ChartError />}
             {loading && <ChartLoading />}
             {!loading && !error && <GrafikPolaHarian data={data} />}
             <div style={{ marginTop: 14, padding: '12px 16px', background: '#DBEAFE', borderRadius: 12, border: '1px solid #93C5FD' }}>
               <p style={{ fontSize: 12, color: '#1E40AF', lineHeight: 1.7, margin: 0 }}>
-                <strong>Insight Pola Harian:</strong> Puncak konsentrasi PM2.5 biasanya terjadi pada jam sibuk pagi (07:00–09:00) dan malam (18:00–20:00). Konsentrasi terendah cenderung terjadi pada siang hari ketika dispersi udara lebih baik.
+                <strong>Insight Pola Harian:</strong> Puncak konsentrasi PM2.5 biasanya terjadi pada jam sibuk pagi (07:00–09:00) dan malam (18:00–20:00). Konsentrasi terendah cenderung terjadi pada siang hari.
               </p>
             </div>
           </div>
         </section>
       )}
 
-      {/* ── FOOTER CTA ── */}
+      {/* ── FOOTER CTA — soft ── */}
       <section style={{
-        background: 'linear-gradient(145deg, #0B1F3A 0%, #0D3B6E 60%, #1058A8 100%)',
-        borderRadius: 20, padding: '28px 32px',
-        textAlign: 'center', position: 'relative', overflow: 'hidden', marginTop: 20,
+        background: 'linear-gradient(135deg, #DBEAFE 0%, #EDE9FE 50%, #DCFCE7 100%)',
+        borderRadius: 20, padding: '28px 32px', textAlign: 'center',
+        position: 'relative', overflow: 'hidden', marginTop: 20,
+        border: '1.5px solid #E2E8F0',
       }}>
-        <div style={{ position: 'absolute', top: -30, right: -30, width: 160, height: 160, borderRadius: '50%', background: 'rgba(59,130,246,0.13)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', top: -30, right: -30, width: 160, height: 160, borderRadius: '50%', background: 'rgba(37,99,235,0.1)', pointerEvents: 'none' }} />
         <div style={{ position: 'relative' }}>
-          <div style={{ fontSize: 18, fontWeight: 800, color: '#fff', marginBottom: 8 }}>
-            Temukan anomali dan prediksi lebih lanjut
-          </div>
-          <p style={{ fontSize: 13, color: '#94A3B8', lineHeight: 1.7, marginBottom: 16 }}>
+          <div style={{ fontSize: 18, fontWeight: 800, color: '#1E3A8A', marginBottom: 8 }}>Temukan anomali dan prediksi lebih lanjut</div>
+          <p style={{ fontSize: 13, color: '#1D4ED8', lineHeight: 1.7, marginBottom: 16, opacity: 0.85 }}>
             Gunakan tab Anomali untuk deteksi lonjakan otomatis, atau tab Prediksi untuk melihat forecast 3 jam ke depan.
           </p>
           <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
             {[
-              { icon: 'ti-alert-triangle', label: 'Lihat Anomali',  color: '#FCD34D' },
-              { icon: 'ti-crystal-ball',   label: 'Lihat Prediksi', color: '#60A5FA' },
+              { icon: 'ti-alert-triangle', label: 'Lihat Anomali',  bg: '#FEF3C7', border: '#FCD34D', color: '#78350F' },
+              { icon: 'ti-crystal-ball',   label: 'Lihat Prediksi', bg: '#EDE9FE', border: '#C4B5FD', color: '#3B0764' },
             ].map(btn => (
               <span key={btn.label} style={{
                 fontSize: 12, fontWeight: 700, padding: '8px 18px', borderRadius: 20,
-                background: 'rgba(255,255,255,0.08)', border: `1px solid ${btn.color}40`,
+                background: btn.bg, border: `1px solid ${btn.border}`,
                 color: btn.color, display: 'flex', alignItems: 'center', gap: 7,
                 cursor: 'default', transition: 'all 0.18s',
               }}
-              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.14)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; e.currentTarget.style.transform = 'translateY(0)'; }}
+              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = `0 4px 12px ${btn.border}80`; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}
               >
                 <i className={`ti ${btn.icon}`} style={{ fontSize: 14 }} aria-hidden />
                 {btn.label}

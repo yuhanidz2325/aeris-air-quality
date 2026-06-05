@@ -140,6 +140,33 @@ function LandingPage({ onEnter }) {
             transform: visible ? 'translateY(0)' : 'translateY(30px)',
             transition: 'opacity 0.7s ease, transform 0.7s ease',
           }}>
+            {/* Brand name */}
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{
+                  width: 48, height: 48, borderRadius: 14,
+                  background: 'linear-gradient(135deg, #0891B2, #2563EB)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  boxShadow: '0 4px 16px rgba(8,145,178,0.3)',
+                }}>
+                  <i className="ti ti-wind" style={{ fontSize: 24, color: '#fff' }} aria-hidden />
+                </div>
+                <div style={{ textAlign: 'left' }}>
+                  <div style={{
+                    fontSize: 36, fontWeight: 800, color: '#0F172A',
+                    letterSpacing: '-0.02em', lineHeight: 1,
+                    background: 'linear-gradient(90deg, #0891B2, #2563EB)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                  }}>
+                    AERIS
+                  </div>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: '#64748B', letterSpacing: '0.08em' }}>
+                    AIR QUALITY MONITORING SYSTEM
+                  </div>
+                </div>
+              </div>
+            </div>
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
               <span style={{
                 fontSize: 12, fontWeight: 700, color: '#475569',

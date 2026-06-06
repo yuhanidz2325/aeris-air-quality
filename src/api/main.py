@@ -276,6 +276,7 @@ async def get_history(
     end_date: datetime,
     parameter: Optional[str] = None
 ):
+    end_date = end_date.replace(hour=23, minute=59, second=59)
     query = """
         SELECT timestamp, pm25, pm10, co, no2, o3
         FROM air_quality_raw

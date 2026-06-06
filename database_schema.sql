@@ -13,8 +13,12 @@ CREATE TABLE air_quality_raw (
     o3 FLOAT,
     temperature FLOAT,
     humidity FLOAT,
+    wind_speed FLOAT,
+    wind_direction FLOAT,
+    precipitation FLOAT,
     timestamp TIMESTAMP,
-    is_processed BOOLEAN DEFAULT FALSE
+    is_processed BOOLEAN DEFAULT FALSE,
+    UNIQUE (city_id, timestamp)
 );
 
 CREATE TABLE predictions (

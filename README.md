@@ -146,16 +146,16 @@ def get_time_segment(hour):
     else:
         return "SORE_MALAM"  # rush hour sore + inversi malam
 ```
-
 ### 3. Hasil 15 Model PyCaret
 
 | Parameter | PAGI (06:00-11:59) | SIANG (12:00-17:59) | SORE/MALAM (18:00-05:59) |
 |:---|:---|:---|:---|
-| **PM2.5** | BayesianRidge (R2=0.998) | BayesianRidge (R2=0.997) | Ridge (R2=0.999) |
-| **PM10** | BayesianRidge (R2=0.998) | BayesianRidge (R2=0.998) | BayesianRidge (R2=0.999) |
-| **CO** | CatBoost (R2=0.860) | CatBoost (R2=0.844) | CatBoost (R2=0.863) |
-| **NO2** | CatBoost (R2=0.918) | CatBoost (R2=0.858) | CatBoost (R2=0.930) |
-| **O3** | CatBoost (R2=0.905) | CatBoost (R2=0.867) | CatBoost (R2=0.867) |
+| **PM2.5** | Lasso (MAE=0.85, R2=0.995) | BayesianRidge (MAE=0.58, R2=0.987) | Lasso (MAE=0.59, R2=0.997) |
+| **PM10** | Lasso (MAE=0.90, R2=0.993) | BayesianRidge (MAE=0.57, R2=0.987) | Lasso (MAE=0.55, R2=0.997) |
+| **CO** | ExtraTrees (MAE=0.16, R2=0.718) | GradientBoosting (MAE=0.15, R2=0.711) | LGBM (MAE=0.23, R2=0.792) |
+| **NO2** | LGBM (MAE=3.24, R2=0.760) | LGBM (MAE=3.03, R2=0.762) | ElasticNet (MAE=3.99, R2=0.782) |
+| **O3** | ExtraTrees (MAE=14.90, R2=0.815) | BayesianRidge (MAE=11.38, R2=0.758) | GradientBoosting (MAE=10.60, R2=0.551) |
+
 
 ### 4. Isolation Forest (Anomaly Detection)
 
@@ -178,6 +178,41 @@ def get_time_segment(hour):
 | **Mean Residual** | -0.2349 | ✅ Mendekati 0 |
 
 **Kesimpulan:** Model sangat akurat dan siap digunakan untuk prediksi real-time.
+
+---
+
+## 📊 Ringkasan Hasil Notebook 1-5
+
+### 📈 Statistik Data
+| Metrik | Nilai |
+|--------|-------|
+| Total data | 3,696 jam |
+| Rentang waktu | 1 Jan - 31 Mei 2026 |
+| Polutan | PM2.5, PM10, CO, NO2, O3 |
+
+### 🕐 Segmentasi Waktu
+| Segmen | Jam | Jumlah Data | Persentase Anomali |
+|--------|-----|-------------|-------------------|
+| PAGI | 06:00-11:59 | 924 jam | 3.14% |
+| SIANG | 12:00-17:59 | 924 jam | 1.41% |
+| SORE_MALAM | 18:00-05:59 | 1,848 jam | 7.74% |
+
+### 🔍 Deteksi Anomali (Isolation Forest)
+| Metrik | Nilai | Evaluasi |
+|--------|-------|----------|
+| Silhouette Score | 0.6970 | ✅ Sangat baik |
+| Detected Rate | 5.01% | ✅ Sesuai target |
+| Gap Separation | 0.1660 | ✅ Baik |
+| Top-10 PM2.5 | 116 vs 35 | ✅ 3x lebih tinggi |
+
+### 🕐 Top 5 Jam Anomali Tertinggi
+| Jam | Jumlah Anomali |
+|-----|----------------|
+| 20:00 | 18 jam |
+| 19:00 | 17 jam |
+| 06:00 | 16 jam |
+| 22:00 | 14 jam |
+| 00:00 | 12 jam |
 
 ---
 

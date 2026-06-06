@@ -251,7 +251,7 @@ def get_time_segment(hour):
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/kelompok-aeris/capstone-air-quality.git
+git clone https://github.com/yuhanidz2325/aeris-air-quality.git
 cd capstone-air-quality
 
 # 2. Setup environment variables
@@ -288,6 +288,43 @@ uvicorn src.api.main:app --reload --port 8000
 # 5. Sajikan frontend (terminal terpisah)
 cd frontend && python -m http.server 8888
 ```
+### Menjalankan via Docker Hub (Tanpa Build)
+
+Cara ini cocok siapapun yang ingin menjalankan
+aplikasi tanpa perlu build image sendiri.
+
+**Prasyarat:**
+- ✅ Docker Desktop terinstall
+- ✅ Git terinstall
+- ✅ File `surabaya_airquality_raw.csv` (minta ke tim pengembang)
+
+```bash
+# 1. Clone repository
+git clone https://github.com/yuhanidz2325/aeris-air-quality.git
+cd aeris-air-quality
+
+# 2. Buat file docker-compose.env
+DB_HOST=db
+DB_PORT=5432
+DB_NAME=aeris_air_quality
+DB_USER=postgres
+DB_PASSWORD=postgres
+
+# 3. Jalankan semua container (image otomatis di-pull dari Docker Hub)
+docker-compose up -d
+
+# 4. Tunggu semua container healthy, lalu import data historis
+docker exec aeris_backend mkdir -p /app/data/raw
+docker cp data/raw/surabaya_airquality_raw.csv aeris_backend:/app/data/raw/
+docker exec -it aeris_backend python -m src.data.fetch_data
+
+# 5. Akses aplikasi
+# Frontend : http://localhost:8888
+# API Docs : http://localhost:8000/docs
+```
+
+> ⚠️ File `docker-compose.env` tidak ikut di GitHub karena berisi kredensial.
+> Minta file ini ke tim pengembang atau buat manual sesuai langkah di atas.
 
 ---
 

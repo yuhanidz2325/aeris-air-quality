@@ -54,6 +54,7 @@ class HistoryResponse(BaseModel):
 class PredictionResponse(BaseModel):
     segment: str
     predictions: Dict[str, List[float]]
+    models_used: Dict[str, str]  # <-- TAMBAHKAN INI
 
 class AnomalyDetail(BaseModel):
     status_anomali: bool
@@ -112,6 +113,27 @@ def save_prediction_to_db(segment: str, predictions: dict):
     for param, preds in predictions.items():
         if len(preds) > 0:
             execute_query(query, (now, segment, param, preds[0]), fetch=False)
+
+def get_model_name(segment: str, polutan: str) -> str:
+    """Mapping model berdasarkan segmen dan polutan dari hasil training"""
+    mapping = {
+        ("PAGI", "pm25"): "Lasso",
+        ("PAGI", "pm10"): "Lasso",
+        ("PAGI", "co"): "ExtraTreesRegressor",
+        ("PAGI", "no2"): "LGBMRegressor",
+        ("PAGI", "o3"): "ExtraTreesRegressor",
+        ("SIANG", "pm25"): "BayesianRidge",
+        ("SIANG", "pm10"): "BayesianRidge",
+        ("SIANG", "co"): "GradientBoostingRegressor",
+        ("SIANG", "no2"): "LGBMRegressor",
+        ("SIANG", "o3"): "BayesianRidge",
+        ("SORE_MALAM", "pm25"): "Lasso",
+        ("SORE_MALAM", "pm10"): "Lasso",
+        ("SORE_MALAM", "co"): "LGBMRegressor",
+        ("SORE_MALAM", "no2"): "ElasticNet",
+        ("SORE_MALAM", "o3"): "GradientBoostingRegressor",
+    }
+    return mapping.get((segment, polutan), "PyCaret Model")
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -288,6 +310,9 @@ async def get_history(
                     })
     return history_data
 
+# ============================================================
+# ENDPOINT PREDIKSI - DENGAN models_used
+# ============================================================
 @app.get("/predict/surabaya", response_model=PredictionResponse)
 async def get_predictions():
     tz = pytz.timezone('Asia/Jakarta')
@@ -344,7 +369,18 @@ async def get_predictions():
             predictions[param] = [40.1, 42.5, 45.0]
 
     save_prediction_to_db(segment, predictions)
-    return {"segment": segment, "predictions": predictions}
+    
+    # Mapping model yang digunakan per polutan
+    models_used = {
+        polutan: get_model_name(segment, polutan) 
+        for polutan in ["pm25", "pm10", "co", "no2", "o3"]
+    }
+    
+    return {
+        "segment": segment, 
+        "predictions": predictions,
+        "models_used": models_used
+    }
 
 @app.get("/anomaly/surabaya", response_model=AnomalyResponse)
 async def get_anomaly_status():

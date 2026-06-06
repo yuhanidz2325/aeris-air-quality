@@ -59,6 +59,7 @@ function ChartLoading() {
 function Prediksi() {
   const [predictions,     setPredictions]     = useState(null);
   const [segment,         setSegment]         = useState('');
+  const [modelsUsed,      setModelsUsed]      = useState(null);
   const [chartData,       setChartData]       = useState([]);
   const [loading,         setLoading]         = useState(true);
   const [error,           setError]           = useState(false);
@@ -71,8 +72,12 @@ function Prediksi() {
       try {
         const predRes  = await fetch(`${BASE_URL}/predict/surabaya`);
         const predData = await predRes.json();
+        
+        console.log("API Response:", predData); // Buat debugging
+        
         setPredictions(predData.predictions);
         setSegment(predData.segment);
+        setModelsUsed(predData.models_used);  // <-- KUNCI UTAMA
 
         const now       = new Date();
         const endDate   = now.toISOString().split('T')[0];
@@ -131,12 +136,6 @@ function Prediksi() {
     return parts.join('. ') + '. Secara umum kualitas udara Kota Surabaya diperkirakan tetap terkendali dalam 3 jam ke depan.';
   };
 
-  const btnBase = {
-    fontSize: 12, fontWeight: 700, padding: '7px 14px', borderRadius: 20,
-    cursor: 'pointer', fontFamily: 'inherit', border: '1.5px solid #E2E8F0',
-    background: '#F8FAFC', color: '#64748B', transition: 'all 0.18s ease',
-  };
-
   if (loading) return (
     <div className="tab-content" style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
       <section style={{
@@ -170,6 +169,9 @@ function Prediksi() {
     </div>
   );
 
+  // Get current model name for display
+  const currentModel = modelsUsed?.[selectedPolutan] || 'Multi-Model';
+
   return (
     <div className="tab-content" style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
 
@@ -199,12 +201,12 @@ function Prediksi() {
             Forecast Polutan Surabaya
           </div>
           <div style={{ fontSize: 14, color: '#4C1D95', lineHeight: 1.7, marginBottom: 24, maxWidth: 520, opacity: 0.85 }}>
-            Prediksi konsentrasi polutan udara 3 jam ke depan menggunakan model machine learning Random Forest yang telah dilatih dengan data historis Surabaya.
+            Prediksi konsentrasi polutan udara 3 jam ke depan menggunakan model machine learning yang telah dilatih dengan data historis Surabaya.
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
             {[
-              { icon: 'ti-cpu',       label: 'Model Aktif',  value: 'Random Forest',  color: '#6D28D9', bg: 'rgba(139,92,246,0.1)',  border: 'rgba(139,92,246,0.2)'  },
+              { icon: 'ti-cpu',       label: 'Model Aktif',  value: currentModel,  color: '#6D28D9', bg: 'rgba(139,92,246,0.1)',  border: 'rgba(139,92,246,0.2)'  },
               { icon: 'ti-clock',     label: 'Segmen Waktu', value: segment || '—',   color: '#1D4ED8', bg: 'rgba(37,99,235,0.1)',   border: 'rgba(37,99,235,0.2)'   },
               { icon: 'ti-chart-bar', label: 'Akurasi (R²)', value: '87%',            color: '#065F46', bg: 'rgba(22,163,74,0.1)',   border: 'rgba(22,163,74,0.2)'   },
               { icon: 'ti-target',    label: 'Horizon',      value: '3 jam ke depan', color: '#92400E', bg: 'rgba(217,119,6,0.1)',   border: 'rgba(217,119,6,0.2)'   },
@@ -376,7 +378,7 @@ function Prediksi() {
             </div>
             <div>
               <div style={{ fontSize: 16, fontWeight: 800, color: '#1E1B4B' }}>Insight Prediksi 3 Jam ke Depan</div>
-              <div style={{ fontSize: 12, color: '#6D28D9', marginTop: 2 }}>Berdasarkan model {segment || 'aktif'}</div>
+              <div style={{ fontSize: 12, color: '#6D28D9', marginTop: 2 }}>Berdasarkan model {currentModel} untuk segmen {segment || 'aktif'}</div>
             </div>
           </div>
           <div style={{ background: 'rgba(255,255,255,0.65)', borderRadius: 12, padding: '14px 18px', fontSize: 13, lineHeight: 1.8, color: '#3B0764', marginBottom: 16 }}>
@@ -384,7 +386,7 @@ function Prediksi() {
           </div>
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             {[
-              { icon: 'ti-cpu',     label: 'Model: Random Forest' },
+              { icon: 'ti-cpu',     label: `Model: ${currentModel}` },
               { icon: 'ti-clock',   label: 'Horizon: 3 jam'       },
               { icon: 'ti-refresh', label: 'Update: setiap jam'   },
             ].map(tag => (

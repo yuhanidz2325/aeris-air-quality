@@ -33,6 +33,7 @@ function TrendChart({ baseUrl }) {
   const [data,  setData]  = useState([]);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({ max: 0, min: 0, avg: 0 });
 
   useEffect(() => {
     async function loadHistory() {
@@ -46,10 +47,37 @@ function TrendChart({ baseUrl }) {
         );
         const json = await res.json();
 
-        const formatted = json.map(item => ({
-          timestamp: item.timestamp.slice(5, 10),
-          pm25: item.value ?? 0,
+        // ✅ AGREGASI PER HARI (rata-rata per hari)
+        const dailyMap = new Map();
+        
+        json.forEach(item => {
+          const date = new Date(item.timestamp);
+          const dateKey = `${date.getDate()}/${date.getMonth() + 1}`;
+          const value = item.value ?? 0;
+          
+          if (!dailyMap.has(dateKey)) {
+            dailyMap.set(dateKey, { sum: value, count: 1 });
+          } else {
+            const existing = dailyMap.get(dateKey);
+            existing.sum += value;
+            existing.count += 1;
+            dailyMap.set(dateKey, existing);
+          }
+        });
+        
+        // Konversi ke array dengan rata-rata per hari
+        const formatted = Array.from(dailyMap.entries()).map(([dateKey, { sum, count }]) => ({
+          timestamp: dateKey,
+          pm25: sum / count,
         }));
+        
+        // Hitung statistik
+        const values = formatted.map(d => d.pm25);
+        const maxVal = Math.max(...values);
+        const minVal = Math.min(...values);
+        const avgVal = values.reduce((a, b) => a + b, 0) / values.length;
+        
+        setStats({ max: maxVal, min: minVal, avg: avgVal });
         setData(formatted);
       } catch (err) {
         console.error('Gagal fetch history:', err);
@@ -104,18 +132,14 @@ function TrendChart({ baseUrl }) {
     </div>
   );
 
-  const maxVal = Math.max(...data.map(d => d.pm25));
-  const minVal = Math.min(...data.map(d => d.pm25));
-  const avgVal = (data.reduce((a, b) => a + b.pm25, 0) / data.length).toFixed(1);
-
   return (
     <div>
       {/* Stat strip */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 16 }}>
         {[
-          { label: 'Tertinggi', value: maxVal.toFixed(1), color: '#DC2626', bg: '#FEE2E2', border: '#FECACA', icon: 'ti-arrow-up' },
-          { label: 'Rata-rata', value: avgVal,            color: '#2563EB', bg: '#DBEAFE', border: '#93C5FD', icon: 'ti-minus'    },
-          { label: 'Terendah',  value: minVal.toFixed(1), color: '#16A34A', bg: '#DCFCE7', border: '#86EFAC', icon: 'ti-arrow-down' },
+          { label: 'Tertinggi', value: stats.max.toFixed(1), color: '#DC2626', bg: '#FEE2E2', border: '#FECACA', icon: 'ti-arrow-up' },
+          { label: 'Rata-rata', value: stats.avg.toFixed(1), color: '#2563EB', bg: '#DBEAFE', border: '#93C5FD', icon: 'ti-minus'    },
+          { label: 'Terendah',  value: stats.min.toFixed(1), color: '#16A34A', bg: '#DCFCE7', border: '#86EFAC', icon: 'ti-arrow-down' },
         ].map(item => (
           <div key={item.label}
             style={{
@@ -181,11 +205,13 @@ function TrendChart({ baseUrl }) {
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+            
             <XAxis
               dataKey="timestamp"
               stroke="#CBD5E1"
               tick={{ fill: '#94A3B8', fontSize: 12, fontWeight: 500 }}
             />
+            
             <YAxis
               stroke="#CBD5E1"
               tick={{ fill: '#94A3B8', fontSize: 12, fontWeight: 500 }}

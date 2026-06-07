@@ -395,47 +395,48 @@ aeris-air-quality/
 -- 1. Tabel cities
 CREATE TABLE cities (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    latitude DECIMAL(10, 8) NOT NULL,
-    longitude DECIMAL(11, 8) NOT NULL
+    name VARCHAR(100) NOT NULL
 );
 
 -- 2. Tabel air_quality_raw
 CREATE TABLE air_quality_raw (
     id SERIAL PRIMARY KEY,
-    timestamp TIMESTAMP NOT NULL,
     city_id INTEGER REFERENCES cities(id),
-    pm25 DECIMAL, pm10 DECIMAL, co DECIMAL, no2 DECIMAL, o3 DECIMAL,
-    temperature DECIMAL, humidity DECIMAL, wind_speed DECIMAL,
-    wind_direction DECIMAL, precipitation DECIMAL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    pm25 FLOAT,
+    pm10 FLOAT,
+    co FLOAT,
+    no2 FLOAT,
+    o3 FLOAT,
+    temperature FLOAT,
+    humidity FLOAT,
+    wind_speed FLOAT,
+    wind_direction FLOAT,
+    precipitation FLOAT,
+    timestamp TIMESTAMP,
+    is_processed BOOLEAN DEFAULT FALSE,
+    UNIQUE (city_id, timestamp)
 );
 
 -- 3. Tabel predictions
 CREATE TABLE predictions (
     id SERIAL PRIMARY KEY,
-    timestamp TIMESTAMP NOT NULL,
-    predict_for TIMESTAMP NOT NULL,
-    city_id INTEGER REFERENCES cities(id),
-    time_segment VARCHAR(20) NOT NULL,
-    parameter VARCHAR(10) NOT NULL,
-    predicted_value DECIMAL NOT NULL,
-    model_version VARCHAR(50)
+    parameter VARCHAR(50),
+    time_segment VARCHAR(50),
+    predicted_value FLOAT,
+    prediction_time TIMESTAMP
 );
 
 -- 4. Tabel anomaly_results
 CREATE TABLE anomaly_results (
     id SERIAL PRIMARY KEY,
-    timestamp TIMESTAMP NOT NULL,
-    city_id INTEGER REFERENCES cities(id),
-    parameter VARCHAR(10) NOT NULL,
-    anomaly_score DECIMAL,
-    is_anomaly BOOLEAN NOT NULL
+    parameter VARCHAR(50),
+    is_anomaly BOOLEAN,
+    anomaly_score FLOAT,
+    detection_time TIMESTAMP
 );
 
 -- Insert Surabaya
-INSERT INTO cities (name, latitude, longitude) 
-VALUES ('Surabaya', -7.2575, 112.7521);
+INSERT INTO cities (name) VALUES ('Surabaya');
 ```
 
 ---

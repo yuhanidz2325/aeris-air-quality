@@ -44,11 +44,9 @@ def get_model_name(segment: str, polutan: str) -> str:
     return mapping.get((segment, polutan), "PyCaret Model")
 
 def get_latest_data_for_prediction():
-    """Ambil data terbaru dari database untuk prediksi"""
+    """Ambil data terbaru dari database untuk prediksi (HANYA POLUTAN)"""
     query = """
-        SELECT pm25, pm10, co, no2, o3, 
-               temperature_2m, relative_humidity, wind_speed_10m, 
-               wind_direction_10m, precipitation, timestamp
+        SELECT pm25, pm10, co, no2, o3, timestamp
         FROM air_quality_raw 
         ORDER BY timestamp DESC 
         LIMIT 25
@@ -60,9 +58,7 @@ def get_latest_data_for_prediction():
         return create_dummy_data()
     
     df = pd.DataFrame(rows, columns=[
-        "pm25", "pm10", "co", "no2", "o3",
-        "temperature_2m", "relative_humidity", "wind_speed_10m",
-        "wind_direction_10m", "precipitation", "timestamp"
+        "pm25", "pm10", "co", "no2", "o3", "timestamp"
     ])
     
     current = df.iloc[0:1].copy()
@@ -87,13 +83,14 @@ def get_latest_data_for_prediction():
     return current
 
 def create_dummy_data():
-    """Buat data dummy untuk testing"""
+    """Buat data dummy untuk testing (HANYA POLUTAN)"""
     now = datetime.now()
     dummy = pd.DataFrame([{
         "pm25": 35.5, "pm10": 42.3, "co": 0.8, "no2": 15.2, "o3": 45.6,
-        "temperature_2m": 32.5, "relative_humidity": 65.0, "wind_speed_10m": 3.2,
-        "wind_direction_10m": 120.0, "precipitation": 0.0, "timestamp": now,
-        "hour": now.hour, "day_of_week": now.weekday(), "month": now.month,
+        "timestamp": now,
+        "hour": now.hour,
+        "day_of_week": now.weekday(),
+        "month": now.month,
         "is_weekend": 1 if now.weekday() >= 5 else 0,
         "pm25_lag_1h": 34.2, "pm25_lag_3h": 33.8, "pm25_lag_24h": 36.1,
         "pm10_lag_1h": 41.5, "pm10_lag_3h": 40.9, "pm10_lag_24h": 43.0,

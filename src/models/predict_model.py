@@ -19,10 +19,9 @@ from pycaret.regression import load_model, predict_model
 
 POLUTAN = ["pm25", "pm10", "co", "no2", "o3"]
 
+# HANYA FITUR YANG TERSEDIA (meteorologi tidak ada)
 BASE_FEATURES = [
     "hour", "day_of_week", "month", "is_weekend",
-    "temperature_2m", "relative_humidity",
-    "wind_speed_10m", "wind_direction_10m", "precipitation",
 ]
 for p in POLUTAN:
     for lag in [1, 3, 24]:

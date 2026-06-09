@@ -383,7 +383,7 @@ docker cp data/raw/surabaya_airquality_raw.csv aeris_backend:/app/data/raw/
 docker exec -it aeris_backend python -m src.data.fetch_data
 
 # 5. Akses aplikasi
-# Frontend : http://localhost:5173
+# Frontend : http://localhost:8888
 # API Docs : http://localhost:8000/docs
 ```
 

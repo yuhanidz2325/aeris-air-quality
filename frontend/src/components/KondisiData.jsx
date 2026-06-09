@@ -69,23 +69,33 @@ function KondisiData({ lastUpdate }) {
   const [pipelineStatus] = useState({ errors24h: 0 });
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const res  = await fetch(`${BASE_URL}/status/surabaya`);
-        const data = await res.json();
-        setStatusData(data);
-      } catch (err) {
-        console.error('Gagal fetch kondisi data:', err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchData();
-  }, []);
+      async function fetchData() {
+        try {
+          const res  = await fetch(`${BASE_URL}/status/surabaya`);
+          const data = await res.json();
+          setStatusData(data);
+        } catch (err) {
+          console.error('Gagal fetch kondisi data:', err);
+        }
 
-  const totalData    = 18432;
-  const dataValid    = 98.7;
-  const missingValue = 1.3;
+        try {
+          const statsRes  = await fetch(`${BASE_URL}/stats/surabaya`);
+          const statsData = await statsRes.json();
+          setTotalData(statsData.total_data);
+          setDataValid(statsData.valid_pct);
+          setMissingValue(statsData.missing_pct);
+        } catch (err) {
+          console.error('Gagal fetch stats:', err);
+        } finally {
+          setLoading(false);
+        }
+      }
+      fetchData();
+    }, []);
+
+  const [totalData,    setTotalData]    = useState(0);
+  const [dataValid,    setDataValid]    = useState(0);
+  const [missingValue, setMissingValue] = useState(0);
 
   const pollutantDistribution = statusData?.pollutants
     ? [

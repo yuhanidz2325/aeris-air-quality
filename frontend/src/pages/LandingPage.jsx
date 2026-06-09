@@ -287,8 +287,8 @@ function LandingPage({ onEnter }) {
           }}>
             {[
               { icon: 'ti-clock',     value: 'Setiap Jam', label: 'Frekuensi Update',     color: '#0891B2', textColor: '#0E7490' },
-              { icon: 'ti-database',  value: '18.432+',    label: 'Data Historis',         color: '#2563EB', textColor: '#1E3A8A' },
-              { icon: 'ti-cpu',       value: '15 Model',   label: 'ML Dibandingkan',       color: '#6366F1', textColor: '#3730A3' },
+              { icon: 'ti-database',  value: '3.720+',    label: 'Data Historis',         color: '#2563EB', textColor: '#1E3A8A' },
+              { icon: 'ti-cpu',       value: '20 Model',   label: 'ML Dibandingkan',       color: '#6366F1', textColor: '#3730A3' },
               { icon: 'ti-chart-bar', value: '87%',        label: 'Akurasi Prediksi (R²)', color: '#16A34A', textColor: '#14532D' },
             ].map(item => (
               <div key={item.label} style={{ textAlign: 'center' }}>

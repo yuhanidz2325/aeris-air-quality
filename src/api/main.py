@@ -399,3 +399,21 @@ async def get_anomaly_status():
     anomaly_results = predict_anomaly(current_data)
 
     return {"timestamp": datetime.now(tz), "results": anomaly_results}
+
+@app.get("/stats/surabaya")
+async def get_stats():
+    total = execute_query("SELECT COUNT(*) FROM air_quality_raw", fetch=True)
+    valid = execute_query(
+        "SELECT COUNT(*) FROM air_quality_raw WHERE pm25 IS NOT NULL AND pm10 IS NOT NULL AND co IS NOT NULL",
+        fetch=True
+    )
+
+    total_count = total[0][0] if total else 0
+    valid_count = valid[0][0] if valid else 0
+    valid_pct   = round((valid_count / total_count * 100), 1) if total_count > 0 else 0
+
+    return {
+        "total_data":  total_count,
+        "valid_pct":   valid_pct,
+        "missing_pct": round(100 - valid_pct, 1)
+    }

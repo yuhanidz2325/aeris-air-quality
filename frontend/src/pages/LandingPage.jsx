@@ -4,18 +4,32 @@ function LandingPage({ onEnter }) {
   const [visible, setVisible] = useState(false);
   const [time, setTime]       = useState('');
   const [date, setDate]       = useState('');
+  const [totalData, setTotalData] = useState('3.720+');
 
   useEffect(() => {
-    setTimeout(() => setVisible(true), 100);
-    function updateTime() {
-      const now = new Date();
-      setTime(now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
-      setDate(now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
-    }
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-    return () => clearInterval(interval);
-  }, []);
+      setTimeout(() => setVisible(true), 100);
+      function updateTime() {
+        const now = new Date();
+        setTime(now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+        setDate(now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
+      }
+      updateTime();
+      const interval = setInterval(updateTime, 1000);
+      return () => clearInterval(interval);
+    }, []);
+
+    useEffect(() => {
+      async function fetchStats() {
+        try {
+          const res  = await fetch(`${import.meta.env.VITE_API_URL}/stats/surabaya`);
+          const data = await res.json();
+          setTotalData(data.total_data.toLocaleString('id-ID') + '+');
+        } catch (err) {
+          console.error('Gagal fetch stats:', err);
+        }
+      }
+      fetchStats();
+    }, []);
 
   const stats = [
     { icon: 'ti-leaf',  label: 'PM2.5', color: '#16A34A', bg: '#DCFCE7', border: '#86EFAC', textColor: '#14532D' },
@@ -287,7 +301,7 @@ function LandingPage({ onEnter }) {
           }}>
             {[
               { icon: 'ti-clock',     value: 'Setiap Jam', label: 'Frekuensi Update',     color: '#0891B2', textColor: '#0E7490' },
-              { icon: 'ti-database',  value: '3.720+',    label: 'Data Historis',         color: '#2563EB', textColor: '#1E3A8A' },
+              { icon: 'ti-database',  value: totalData,    label: 'Data Historis',         color: '#2563EB', textColor: '#1E3A8A' },
               { icon: 'ti-cpu',       value: '20 Model',   label: 'ML Dibandingkan',       color: '#6366F1', textColor: '#3730A3' },
               { icon: 'ti-chart-bar', value: '87%',        label: 'Akurasi Prediksi (R²)', color: '#16A34A', textColor: '#14532D' },
             ].map(item => (

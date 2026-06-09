@@ -417,3 +417,64 @@ async def get_stats():
         "valid_pct":   valid_pct,
         "missing_pct": round(100 - valid_pct, 1)
     }
+    
+@app.get("/model-results/surabaya")
+async def get_model_results():
+    try:
+        import pandas as pd
+        df = pd.read_excel("reports/rekap_15_model_regresi_improved.xlsx")
+        results = []
+        for _, row in df.iterrows():
+            results.append({
+                "polutan":       str(row["polutan"]),
+                "segmen":        str(row["segmen"]),
+                "model_terbaik": str(row["model_terbaik"]),
+                "mae":           round(float(row["mae_final"]), 4),
+                "rmse":          round(float(row["rmse_final"]), 4),
+                "r2":            round(float(row["r2_final"]), 4),
+            })
+        return {"results": results}
+    except FileNotFoundError:
+        return {"error": "File Excel tidak ditemukan", "results": []}
+    except Exception as e:
+        return {"error": str(e), "results": []}
+    
+@app.get("/pipeline-status/surabaya")
+async def get_pipeline_status():
+    tz = pytz.timezone('Asia/Jakarta')
+    now = datetime.now(tz)
+    
+    # Cek apakah data terbaru masuk dalam 2 jam terakhir
+    last_data = execute_query(
+        "SELECT MAX(timestamp) FROM air_quality_raw", fetch=True
+    )
+    last_timestamp = last_data[0][0] if last_data and last_data[0][0] else None
+    
+    # Cek error 24 jam terakhir (data yang null/kosong)
+    errors = execute_query(
+        """SELECT COUNT(*) FROM air_quality_raw 
+           WHERE timestamp >= NOW() - INTERVAL '24 hours'
+           AND (pm25 IS NULL OR pm10 IS NULL OR co IS NULL)""",
+        fetch=True
+    )
+    errors_count = errors[0][0] if errors else 0
+    
+    # Scheduler aktif jika data masuk dalam 2 jam terakhir
+    if last_timestamp:
+        diff_hours = (now - last_timestamp.replace(tzinfo=tz)).total_seconds() / 3600
+        scheduler_ok = diff_hours <= 2
+        api_fetch_ok = diff_hours <= 2
+    else:
+        scheduler_ok = False
+        api_fetch_ok = False
+
+    return {
+        "scheduler":      "Aktif"    if scheduler_ok  else "Tidak Aktif",
+        "scheduler_ok":   scheduler_ok,
+        "api_fetch":      "Berhasil" if api_fetch_ok  else "Gagal",
+        "api_fetch_ok":   api_fetch_ok,
+        "model_prediksi": "Berjalan",
+        "model_ok":       True,
+        "errors_24h":     errors_count,
+        "errors_ok":      errors_count == 0,
+    }

@@ -4,7 +4,8 @@ function LandingPage({ onEnter }) {
   const [visible, setVisible] = useState(false);
   const [time, setTime]       = useState('');
   const [date, setDate]       = useState('');
-  const [totalData, setTotalData] = useState('3.720+');
+  const [totalData, setTotalData] = useState('');
+  const [r2Score,   setR2Score]   = useState('');
 
   useEffect(() => {
       setTimeout(() => setVisible(true), 100);
@@ -26,6 +27,16 @@ function LandingPage({ onEnter }) {
           setTotalData(data.total_data.toLocaleString('id-ID') + '+');
         } catch (err) {
           console.error('Gagal fetch stats:', err);
+        }
+        try {
+          const modelRes  = await fetch(`${import.meta.env.VITE_API_URL}/model-results/surabaya`);
+          const modelData = await modelRes.json();
+          if (modelData.results && modelData.results.length > 0) {
+            const best = modelData.results.reduce((a, b) => a.r2 > b.r2 ? a : b);
+            setR2Score(`${(best.r2 * 100).toFixed(1)}%`);
+          }
+        } catch (err) {
+          console.error('Gagal fetch R2:', err);
         }
       }
       fetchStats();
@@ -303,7 +314,7 @@ function LandingPage({ onEnter }) {
               { icon: 'ti-clock',     value: 'Setiap Jam', label: 'Frekuensi Update',     color: '#0891B2', textColor: '#0E7490' },
               { icon: 'ti-database',  value: totalData,    label: 'Data Historis',         color: '#2563EB', textColor: '#1E3A8A' },
               { icon: 'ti-cpu',       value: '20 Model',   label: 'ML Dibandingkan',       color: '#6366F1', textColor: '#3730A3' },
-              { icon: 'ti-chart-bar', value: '87%',        label: 'Akurasi Prediksi (R²)', color: '#16A34A', textColor: '#14532D' },
+              { icon: 'ti-chart-bar', value: r2Score,        label: 'Akurasi Prediksi (R²)', color: '#16A34A', textColor: '#14532D' },
             ].map(item => (
               <div key={item.label} style={{ textAlign: 'center' }}>
                 <i className={`ti ${item.icon}`} style={{ fontSize: 26, color: item.color, display: 'block', marginBottom: 8 }} aria-hidden />

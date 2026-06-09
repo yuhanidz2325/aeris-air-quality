@@ -64,6 +64,7 @@ function Prediksi() {
   const [loading,         setLoading]         = useState(true);
   const [error,           setError]           = useState(false);
   const [selectedPolutan, setSelectedPolutan] = useState('pm25');
+  const [r2Score,         setR2Score]         = useState('—');
 
   useEffect(() => {
     async function fetchData() {
@@ -117,6 +118,16 @@ function Prediksi() {
         setError(true);
       } finally {
         setLoading(false);
+      }
+      try {
+        const modelRes  = await fetch(`${BASE_URL}/model-results/surabaya`);
+        const modelData = await modelRes.json();
+        if (modelData.results && modelData.results.length > 0) {
+          const best = modelData.results.reduce((a, b) => a.r2 > b.r2 ? a : b);
+          setR2Score(`${(best.r2 * 100).toFixed(1)}%`);
+        }
+      } catch (err) {
+        console.error('Gagal fetch R2:', err);
       }
     }
     fetchData();
@@ -208,7 +219,7 @@ function Prediksi() {
             {[
               { icon: 'ti-cpu',       label: 'Model Aktif',  value: currentModel,  color: '#6D28D9', bg: 'rgba(139,92,246,0.1)',  border: 'rgba(139,92,246,0.2)'  },
               { icon: 'ti-clock',     label: 'Segmen Waktu', value: segment || '—',   color: '#1D4ED8', bg: 'rgba(37,99,235,0.1)',   border: 'rgba(37,99,235,0.2)'   },
-              { icon: 'ti-chart-bar', label: 'Akurasi (R²)', value: '87%',            color: '#065F46', bg: 'rgba(22,163,74,0.1)',   border: 'rgba(22,163,74,0.2)'   },
+              { icon: 'ti-chart-bar', label: 'Akurasi (R²)', value: r2Score,            color: '#065F46', bg: 'rgba(22,163,74,0.1)',   border: 'rgba(22,163,74,0.2)'   },
               { icon: 'ti-target',    label: 'Horizon',      value: '3 jam ke depan', color: '#92400E', bg: 'rgba(217,119,6,0.1)',   border: 'rgba(217,119,6,0.2)'   },
             ].map(item => (
               <div key={item.label} style={{

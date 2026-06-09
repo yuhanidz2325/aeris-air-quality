@@ -92,6 +92,10 @@ function GrafikPolutan({ data, polutanKey }) {
       return <circle cx={cx} cy={cy} r={6} fill={style.color} stroke="#fff" strokeWidth={2} />;
     if (val === minVal && minVal >= 0 && minVal !== maxVal)
       return <circle cx={cx} cy={cy} r={5} fill={style.color} stroke="#fff" strokeWidth={2} opacity={0.6} />;
+    if (val === maxVal && maxVal > 0)
+      return <circle key={`max-${cx}`} cx={cx} cy={cy} r={6} fill={style.color} stroke="#fff" strokeWidth={2} />;
+    if (val === minVal && minVal >= 0 && minVal !== maxVal)
+      return <circle key={`min-${cx}`} cx={cx} cy={cy} r={5} fill={style.color} stroke="#fff" strokeWidth={2} opacity={0.6} />;
     return null;
   };
 
@@ -146,13 +150,21 @@ function GrafikOverlay({ data }) {
   );
 }
 
-function GrafikPolaHarian({ data }) {
+function GrafikPolaHarian({ data, polutanKey = 'pm25' }) {
   if (!data || data.length === 0) return <ChartLoading />;
+  const cfg   = POLUTAN_CONFIG[polutanKey];
+  const style = POLUTAN_STYLE[polutanKey];
+
   const hourlyMap = {};
   data.forEach(item => {
-    const hour = item.timestamp?.slice(0, 2) || '00';
+    const raw  = item.timestamp || '';
+    const hour = raw.includes('T')
+      ? raw.split('T')[1]?.slice(0, 2)   // format: "2026-06-09T20:00:00"
+      : raw.includes(' ')
+        ? raw.split(' ')[1]?.slice(0, 2) // format: "2026-06-09 20:00:00"
+        : raw.slice(11, 13);             // fallback
     if (!hourlyMap[hour]) hourlyMap[hour] = { total: 0, count: 0 };
-    hourlyMap[hour].total += item.pm25 || 0;
+    hourlyMap[hour].total += item[polutanKey] || 0;
     hourlyMap[hour].count += 1;
   });
   const hourlyData = Object.entries(hourlyMap)
@@ -169,9 +181,9 @@ function GrafikPolaHarian({ data }) {
         <XAxis dataKey="hour" stroke="#CBD5E1" tick={{ fill: '#94A3B8', fontSize: 11 }} />
         <YAxis stroke="#CBD5E1" tick={{ fill: '#94A3B8', fontSize: 11 }} />
         <Tooltip content={<CustomTooltip />} />
-        <Bar dataKey="avg" name="Rata-rata PM2.5" radius={[6, 6, 0, 0]} unit=" µg/m³">
+        <Bar dataKey="avg" name={`Rata-rata ${cfg.label}`} radius={[6, 6, 0, 0]} unit={` ${cfg.unit}`}>
           {hourlyData.map((entry, index) => (
-            <Cell key={index} fill={entry.avg > 55 ? '#DC2626' : entry.avg > 35 ? '#D97706' : '#16A34A'} />
+            <Cell key={index} fill={entry.avg > cfg.batas ? '#DC2626' : entry.avg > cfg.batas * 0.6 ? '#D97706' : style.color} />
           ))}
         </Bar>
       </BarChart>
@@ -474,7 +486,7 @@ function GrafikTren({ baseUrl }) {
                   {cfg.label}
                 </span>
               ))}
-            </div>
+            </div><div style={{ fontSize: 13, color: '#64748B', marginBottom: 16 }}>Rata-rata {POLUTAN_CONFIG[polutanAktif].label} per jam · {RENTANG_OPTIONS.find(r => r.key === rentang)?.label}</div>
             <div style={{ marginTop: 14, padding: '10px 14px', background: '#DBEAFE', borderRadius: 10, border: '1px solid #93C5FD' }}>
               <p style={{ fontSize: 12, color: '#1E40AF', lineHeight: 1.6, margin: 0 }}>
                 <strong>Catatan:</strong> Skala Y menggunakan normalisasi otomatis. Nilai absolut CO jauh lebih besar dari polutan lain.
@@ -487,12 +499,12 @@ function GrafikTren({ baseUrl }) {
       {/* ── VIEW: HARIAN ── */}
       {viewMode === 'harian' && (
         <section style={{ marginBottom: 8 }}>
-          <div style={{ fontSize: 20, fontWeight: 800, color: '#0F172A', marginBottom: 4 }}>Pola Harian PM2.5</div>
-          <div style={{ fontSize: 13, color: '#64748B', marginBottom: 16 }}>Rata-rata konsentrasi per jam · {RENTANG_OPTIONS.find(r => r.key === rentang)?.label}</div>
+          <div style={{ fontSize: 20, fontWeight: 800, color: '#0F172A', marginBottom: 4 }}>Pola Harian {POLUTAN_CONFIG[polutanAktif].label}</div>
+          
           <div style={{ background: '#fff', borderRadius: 18, padding: '20px 22px', border: '1px solid #E2E8F0', boxShadow: '0 1px 4px rgba(15,23,42,0.05)' }}>
             {error && <ChartError />}
             {loading && <ChartLoading />}
-            {!loading && !error && <GrafikPolaHarian data={data} />}
+            {!loading && !error && <GrafikPolaHarian data={data} polutanKey={polutanAktif} />}
             <div style={{ marginTop: 14, padding: '12px 16px', background: '#DBEAFE', borderRadius: 12, border: '1px solid #93C5FD' }}>
               <p style={{ fontSize: 12, color: '#1E40AF', lineHeight: 1.7, margin: 0 }}>
                 <strong>Insight Pola Harian:</strong> Puncak konsentrasi PM2.5 biasanya terjadi pada jam sibuk pagi (07:00–09:00) dan malam (18:00–20:00). Konsentrasi terendah cenderung terjadi pada siang hari.
